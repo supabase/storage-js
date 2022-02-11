@@ -185,6 +185,29 @@ export class StorageFileApi {
   }
 
   /**
+   * Copies an existing file.
+   *
+   * @param fromPath The original file path, including the current file name. For example `folder/image.png`.
+   * @param toPath The new file path, including the new file name. For example `folder/image-copy.png`.
+   */
+  async copy(
+    fromPath: string,
+    toPath: string
+  ): Promise<{ data: { message: string } | null; error: Error | null }> {
+    try {
+      const data = await post(
+        this.fetch,
+        `${this.url}/object/copy`,
+        { bucketId: this.bucketId, sourceKey: fromPath, destinationKey: toPath },
+        { headers: this.headers }
+      )
+      return { data, error: null }
+    } catch (error) {
+      return { data: null, error }
+    }
+  }
+
+  /**
    * Create signed url to download file without requiring permissions. This URL can be valid for a set number of seconds.
    *
    * @param path The file path to be downloaded, including the current file name. For example `folder/image.png`.
