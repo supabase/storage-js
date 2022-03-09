@@ -20,7 +20,7 @@ import { SupabaseStorageClient } from '@supabase/storage-js'
 const STORAGE_URL = "https://<project_ref>.supabase.co/storage/v1";
 const SERVICE_KEY = "<service_role>"; //! service key, not anon key
 
-const storage_client = new SupabaseStorageClient(
+const storageClient = new SupabaseStorageClient(
   STORAGE_URL,
   {
     apikey: SERVICE_KEY,
@@ -34,7 +34,7 @@ const storage_client = new SupabaseStorageClient(
 - Create a new Storage bucket
 
   ``` js
-  const { data, error } = await storage_client.createBucket(
+  const { data, error } = await storageClient.createBucket(
     "test_bucket",    // Bucket name (must be unique)
     { public: false } // Bucket options
   );
@@ -43,13 +43,13 @@ const storage_client = new SupabaseStorageClient(
 - Retrieve the details of an existing Storage bucket
 
   ``` js
-  const { data, error } = await storage_client.getBucket("test_bucket");
+  const { data, error } = await storageClient.getBucket("test_bucket");
   ```
 
 - Updates a new Storage bucket
 
   ``` js
-  const { data, error } = await storage_client.updateBucket(
+  const { data, error } = await storageClient.updateBucket(
     "test_bucket",    // Bucket name
     { public: false } // Bucket options
   );
@@ -58,19 +58,19 @@ const storage_client = new SupabaseStorageClient(
 - Remove all objects inside a single bucket
 
   ``` js
-  const { data, error } = await storage_client.emptyBucket("test_bucket");
+  const { data, error } = await storageClient.emptyBucket("test_bucket");
   ```
 
 - Deletes an existing bucket (a bucket can't be deleted with existing objects inside it):
 
   ``` js
-  const { data, error } = await storage_client.deleteBucket("test_bucket");
+  const { data, error } = await storageClient.deleteBucket("test_bucket");
   ```
 
 - Retrieve the details of all Storage buckets within an existing product:
 
   ``` js
-  const { data, error } = await storage_client.listBuckets();
+  const { data, error } = await storageClient.listBuckets();
   ```
 
 ## Sponsors
