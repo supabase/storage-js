@@ -14,22 +14,14 @@ npm install @supabase/storage-js
 
 ### Connecting to the storage backend
 
-``` bash
-# .env
-SUPABASE_STORAGE_URL=https://<project_ref>.supabase.co/storage/v1
-SUPABASE_SERVICE_KEY=<service_role>
-```
-
 ``` js
-// index.hs
 import { SupabaseStorageClient } from '@supabase/storage-js'
-import 'dotenv/config'
 
-const STORAGE_URL = process.env.SUPABASE_STORAGE_URL;
-const SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY; //! service key, not anon key
+const STORAGE_URL = "https://<project_ref>.supabase.co/storage/v1";
+const SERVICE_KEY = "<service_role>"; //! service key, not anon key
 
 const storage_client = new SupabaseStorageClient(
-    STORAGE_URL,
+  STORAGE_URL,
     {
         apikey: SERVICE_KEY,
         Authorization: `Bearer ${SERVICE_KEY}`,
