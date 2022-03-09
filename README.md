@@ -22,10 +22,10 @@ const SERVICE_KEY = "<service_role>"; //! service key, not anon key
 
 const storage_client = new SupabaseStorageClient(
   STORAGE_URL,
-    {
-        apikey: SERVICE_KEY,
-        Authorization: `Bearer ${SERVICE_KEY}`,
-    }
+  {
+    apikey: SERVICE_KEY,
+    Authorization: `Bearer ${SERVICE_KEY}`,
+  }
 );
 ```
 
@@ -33,39 +33,39 @@ const storage_client = new SupabaseStorageClient(
 
 - Create a new Storage bucket
 
-    ``` js
-    const { data, error } = await storage_client.createBucket("test_bucket", { public: false });
-    ```
+  ``` js
+  const { data, error } = await storage_client.createBucket("test_bucket", { public: false });
+  ```
 
 - Retrieve the details of an existing Storage bucke
 
-    ``` js
-    const { data, error } = await storage_client.getBucket("test_bucket");
-    ```
+  ``` js
+  const { data, error } = await storage_client.getBucket("test_bucket");
+  ```
 
 - Updates a new Storage bucket
 
-    ``` js
-    const { data, error } = await storage_client.createBucket("test_bucket", { public: true });
-    ```
+  ``` js
+  const { data, error } = await storage_client.createBucket("test_bucket", { public: true });
+  ```
 
 - Remove all objects inside a single bucket
 
-    ``` js
-    const { data, error } = await storage_client.getBucket("test_bucket");
-    ```
+  ``` js
+  const { data, error } = await storage_client.getBucket("test_bucket");
+  ```
 
 - Deletes an existing bucket (a bucket can't be deleted with existing objects inside it):
 
-    ``` js
-    const { data, error } = await storage_client.deleteBucket("test_bucket");
-    ```
+  ``` js
+  const { data, error } = await storage_client.deleteBucket("test_bucket");
+  ```
 
 - Retrieve the details of all Storage buckets within an existing product:
 
-    ``` js
-    const { data, error } = await storage_client.listBuckets();
-    ```
+  ``` js
+  const { data, error } = await storage_client.listBuckets();
+  ```
 
 ## Sponsors
 
