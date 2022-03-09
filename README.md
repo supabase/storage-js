@@ -34,10 +34,13 @@ const storage_client = new SupabaseStorageClient(
 - Create a new Storage bucket
 
   ``` js
-  const { data, error } = await storage_client.createBucket("test_bucket", { public: false });
+  const { data, error } = await storage_client.createBucket(
+    "test_bucket",    // Bucket name (must be unique)
+    { public: false } // Bucket options
+  );
   ```
 
-- Retrieve the details of an existing Storage bucke
+- Retrieve the details of an existing Storage bucket
 
   ``` js
   const { data, error } = await storage_client.getBucket("test_bucket");
@@ -46,13 +49,16 @@ const storage_client = new SupabaseStorageClient(
 - Updates a new Storage bucket
 
   ``` js
-  const { data, error } = await storage_client.createBucket("test_bucket", { public: true });
+  const { data, error } = await storage_client.updateBucket(
+    "test_bucket",    // Bucket name
+    { public: false } // Bucket options
+  );
   ```
 
 - Remove all objects inside a single bucket
 
   ``` js
-  const { data, error } = await storage_client.getBucket("test_bucket");
+  const { data, error } = await storage_client.emptyBucket("test_bucket");
   ```
 
 - Deletes an existing bucket (a bucket can't be deleted with existing objects inside it):
