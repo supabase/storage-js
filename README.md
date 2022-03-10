@@ -31,7 +31,7 @@ const storageClient = new SupabaseStorageClient(
 
 ### Handling resources
 
-- Create a new Storage bucket
+- Create a new Storage bucket:
 
   ``` js
   const { data, error } = await storageClient.createBucket(
@@ -40,13 +40,13 @@ const storageClient = new SupabaseStorageClient(
   );
   ```
 
-- Retrieve the details of an existing Storage bucket
+- Retrieve the details of an existing Storage bucket:
 
   ``` js
   const { data, error } = await storageClient.getBucket("test_bucket");
   ```
 
-- Updates a new Storage bucket
+- Updates a new Storage bucket:
 
   ``` js
   const { data, error } = await storageClient.updateBucket(
@@ -55,7 +55,7 @@ const storageClient = new SupabaseStorageClient(
   );
   ```
 
-- Remove all objects inside a single bucket
+- Remove all objects inside a single bucket:
 
   ``` js
   const { data, error } = await storageClient.emptyBucket("test_bucket");
