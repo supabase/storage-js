@@ -16,7 +16,7 @@ export class StorageClient extends StorageBucketApi {
   }
 }
 
-//! Alias `StorageClient` as `SupabaseStorageClient` for backwards compatibility.
+// Alias `StorageClient` as `SupabaseStorageClient` for backwards compatibility.
 export {
   StorageClient as SupabaseStorageClient,
 }
