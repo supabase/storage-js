@@ -15,6 +15,3 @@ export class StorageClient extends StorageBucketApi {
     return new StorageFileApi(this.url, this.headers, id, this.fetch)
   }
 }
-
-// Alias `StorageClient` as `SupabaseStorageClient` for backwards compatibility.
-export { StorageClient as SupabaseStorageClient }
