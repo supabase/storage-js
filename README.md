@@ -67,7 +67,7 @@ const storageClient = new SupabaseStorageClient(
   const { data, error } = await storageClient.deleteBucket("test_bucket");
   ```
 
-- Retrieve the details of all Storage buckets within an existing product:
+- Retrieve the details of all Storage buckets within an existing project:
 
   ``` js
   const { data, error } = await storageClient.listBuckets();
