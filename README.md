@@ -45,7 +45,7 @@ const storageClient = new SupabaseStorageClient(STORAGE_URL, {
   const { data, error } = await storageClient.getBucket('test_bucket')
   ```
 
-- Updates a new Storage bucket:
+- Update a new Storage bucket:
 
   ```js
   const { data, error } = await storageClient.updateBucket(
@@ -60,7 +60,7 @@ const storageClient = new SupabaseStorageClient(STORAGE_URL, {
   const { data, error } = await storageClient.emptyBucket('test_bucket')
   ```
 
-- Deletes an existing bucket (a bucket can't be deleted with existing objects inside it):
+- Delete an existing bucket (a bucket can't be deleted with existing objects inside it):
 
   ```js
   const { data, error } = await storageClient.deleteBucket('test_bucket')
@@ -74,7 +74,7 @@ const storageClient = new SupabaseStorageClient(STORAGE_URL, {
 
 #### Handling Files
 
-- Uploads a file to an existing bucket:
+- Upload a file to an existing bucket:
 
   ```js
   const fileBody = ...; // load your file here
@@ -84,13 +84,13 @@ const storageClient = new SupabaseStorageClient(STORAGE_URL, {
 
   > Note: The `upload` method also accepts a map of optional parameters. For a complete list see the [Supabase API reference](https://supabase.com/docs/reference/javascript/storage-from-upload).
 
-- Downloads a file from an exisiting bucket:
+- Download a file from an exisiting bucket:
 
   ```js
   const { data, error } = await storageClient.from('bucket').download('path/to/file')
   ```
 
-- Lists all the files within a bucket:
+- List all the files within a bucket:
 
   ```js
   const { data, error } = await storageClient.from('bucket').list('folder')
@@ -98,7 +98,7 @@ const storageClient = new SupabaseStorageClient(STORAGE_URL, {
 
   > Note: The `list` method also accepts a map of optional parameters. For a complete list see the [Supabase API reference](https://supabase.com/docs/reference/javascript/storage-from-list).
 
-- Replaces an existing file at the specified path with a new one:
+- Replace an existing file at the specified path with a new one:
 
   ```js
   const fileBody = ...; // load your file here
@@ -108,7 +108,7 @@ const storageClient = new SupabaseStorageClient(STORAGE_URL, {
 
   > Note: The `upload` method also accepts a map of optional parameters. For a complete list see the [Supabase API reference](https://supabase.com/docs/reference/javascript/storage-from-upload).
 
-- Moves an existing file:
+- Move an existing file:
 
   ```js
   const { data, error } = await storageClient
@@ -116,7 +116,7 @@ const storageClient = new SupabaseStorageClient(STORAGE_URL, {
     .move('old/path/to/file', 'new/path/to/file')
   ```
 
-- Deletes files within the same bucket:
+- Delete files within the same bucket:
 
   ```js
   const { data, error } = await storageClient.from('bucket').remove(['path/to/file'])
