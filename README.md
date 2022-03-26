@@ -8,69 +8,87 @@ JS Client library to interact with Supabase Storage.
 
 ### Installing the module
 
-``` bash
+```bash
 npm install @supabase/storage-js
 ```
 
 ### Connecting to the storage backend
 
-``` js
+```js
 import { SupabaseStorageClient } from '@supabase/storage-js'
 
-const STORAGE_URL = "https://<project_ref>.supabase.co/storage/v1";
-const SERVICE_KEY = "<service_role>"; //! service key, not anon key
+const STORAGE_URL = 'https://<project_ref>.supabase.co/storage/v1'
+const SERVICE_KEY = '<service_role>' //! service key, not anon key
 
-const storageClient = new SupabaseStorageClient(
-  STORAGE_URL,
-  {
-    apikey: SERVICE_KEY,
-    Authorization: `Bearer ${SERVICE_KEY}`,
-  }
-);
+const storageClient = new SupabaseStorageClient(STORAGE_URL, {
+  apikey: SERVICE_KEY,
+  Authorization: `Bearer ${SERVICE_KEY}`,
+})
 ```
 
 ### Handling resources
 
+#### Handling Storage Buckets
+
 - Create a new Storage bucket:
 
-  ``` js
+  ```js
   const { data, error } = await storageClient.createBucket(
-    "test_bucket",    // Bucket name (must be unique)
+    'test_bucket', // Bucket name (must be unique)
     { public: false } // Bucket options
-  );
+  )
   ```
 
 - Retrieve the details of an existing Storage bucket:
 
-  ``` js
-  const { data, error } = await storageClient.getBucket("test_bucket");
+  ```js
+  const { data, error } = await storageClient.getBucket('test_bucket')
   ```
 
 - Updates a new Storage bucket:
 
-  ``` js
+  ```js
   const { data, error } = await storageClient.updateBucket(
-    "test_bucket",    // Bucket name
+    'test_bucket', // Bucket name
     { public: false } // Bucket options
-  );
+  )
   ```
 
 - Remove all objects inside a single bucket:
 
-  ``` js
-  const { data, error } = await storageClient.emptyBucket("test_bucket");
+  ```js
+  const { data, error } = await storageClient.emptyBucket('test_bucket')
   ```
 
 - Deletes an existing bucket (a bucket can't be deleted with existing objects inside it):
 
-  ``` js
-  const { data, error } = await storageClient.deleteBucket("test_bucket");
+  ```js
+  const { data, error } = await storageClient.deleteBucket('test_bucket')
   ```
 
 - Retrieve the details of all Storage buckets within an existing project:
 
-  ``` js
-  const { data, error } = await storageClient.listBuckets();
+  ```js
+  const { data, error } = await storageClient.listBuckets()
+  ```
+
+#### Handling Files
+
+- Uploading a file
+
+  ```js
+  const bucket_name = "your-bucket-name-here";
+  const path = "/path/to/file.png";
+  const fileBody = ...; // load your png file here
+  const { data, error } = await storageClient.from(bucket_name).upload(path, fileBody);
+  ```
+
+- Downloading a file
+
+  ```js
+  const bucket_name = 'your-bucket-name-here'
+  const path = '/path/to/file.png'
+  const { data, error } = await storageClient.from(bucket_name).download(path)
   ```
 
 ## Sponsors
