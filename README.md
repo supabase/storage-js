@@ -74,16 +74,23 @@ const storageClient = new SupabaseStorageClient(STORAGE_URL, {
 
 #### Handling Files
 
-- Uploading a file
+- Uploads a file to an existing bucket:
 
   ```js
   const bucket_name = "your-bucket-name-here";
   const path = "/path/to/file.png";
+  const fileOptions = {
+          cacheControl: '3600',
+    upsert: false
+  };
   const fileBody = ...; // load your png file here
-  const { data, error } = await storageClient.from(bucket_name).upload(path, fileBody);
+
+  const { data, error } = await storageClient.from(bucket_name).upload(path, fileBody, fileOptions);
   ```
 
-- Downloading a file
+  > For more details on the `fileOptions` fields and the acceptable data types for the `fileBody`, see [the official supabase documentation](https://supabase.com/docs/reference/javascript/storage-from-upload)
+
+- Downloads a file from an exisiting bucket:
 
   ```js
   const bucket_name = 'your-bucket-name-here'
