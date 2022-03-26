@@ -103,7 +103,7 @@ const storageClient = new SupabaseStorageClient(STORAGE_URL, {
   ```js
   const fileBody = ...; // load your file here
   const { data, error } = await storageClient.from('bucket')
-  .update('path/to/file', fileBody)
+  .update('path/to/file', fileBody);
   ```
 
   > Note: The `upload` method also accepts a map of optional parameters. For a complete list see the [Supabase API reference](https://supabase.com/docs/reference/javascript/storage-from-upload).
