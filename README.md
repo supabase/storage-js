@@ -77,25 +77,64 @@ const storageClient = new SupabaseStorageClient(STORAGE_URL, {
 - Uploads a file to an existing bucket:
 
   ```js
-  const bucket_name = "your-bucket-name-here";
-  const path = "/path/to/file.png";
-  const fileOptions = {
-          cacheControl: '3600',
-    upsert: false
-  };
-  const fileBody = ...; // load your png file here
+  const fileBody = ...; // load your file here
 
-  const { data, error } = await storageClient.from(bucket_name).upload(path, fileBody, fileOptions);
+  const { data, error } = await storageClient.from('bucket').upload('path/to/file', fileBody);
   ```
 
-  > For more details on the `fileOptions` fields and the acceptable data types for the `fileBody`, see [the official supabase documentation](https://supabase.com/docs/reference/javascript/storage-from-upload)
+  > Note: The `upload` method also accepts a map of optional parameters. For a complete list see the [Supabase API reference](https://supabase.com/docs/reference/javascript/storage-from-upload).
 
 - Downloads a file from an exisiting bucket:
 
   ```js
-  const bucket_name = 'your-bucket-name-here'
-  const path = '/path/to/file.png'
-  const { data, error } = await storageClient.from(bucket_name).download(path)
+  const { data, error } = await storageClient.from('bucket').download('path/to/file')
+  ```
+
+- Lists all the files within a bucket:
+
+  ```js
+  const { data, error } = await storageClient.from('bucket').list('folder')
+  ```
+
+  > Note: The `list` method also accepts a map of optional parameters. For a complete list see the [Supabase API reference](https://supabase.com/docs/reference/javascript/storage-from-list).
+
+- Replaces an existing file at the specified path with a new one:
+
+  ```js
+  const fileBody = ...; // load your file here
+  const { data, error } = await storageClient.from('bucket')
+  .update('path/to/file', fileBody)
+  ```
+
+  > Note: The `upload` method also accepts a map of optional parameters. For a complete list see the [Supabase API reference](https://supabase.com/docs/reference/javascript/storage-from-upload).
+
+- Moves an existing file:
+
+  ```js
+  const { data, error } = await storageClient
+    .from('bucket')
+    .move('old/path/to/file', 'new/path/to/file')
+  ```
+
+- Deletes files within the same bucket:
+
+  ```js
+  const { data, error } = await storageClient.from('bucket').remove(['path/to/file'])
+  ```
+
+- Create signed URL to download file without requiring permissions:
+
+  ```js
+  const expireIn = 60
+  const { data, error } = await storageClient
+    .from('bucket')
+    .createSignedUrl('path/to/file', expireIn)
+  ```
+
+- Retrieve URLs for assets in public buckets:
+
+  ```js
+  const { data, error } = await storageClient.from('public-bucket').getPublicUrl('path/to/file')
   ```
 
 ## Sponsors
