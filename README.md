@@ -77,9 +77,9 @@ const storageClient = new SupabaseStorageClient(STORAGE_URL, {
 - Upload a file to an existing bucket:
 
   ```js
-  const fileBody = ...; // load your file here
+  const fileBody = ... // load your file here
 
-  const { data, error } = await storageClient.from('bucket').upload('path/to/file', fileBody);
+  const { data, error } = await storageClient.from('bucket').upload('path/to/file', fileBody)
   ```
 
   > Note: The `upload` method also accepts a map of optional parameters. For a complete list see the [Supabase API reference](https://supabase.com/docs/reference/javascript/storage-from-upload).
@@ -101,9 +101,11 @@ const storageClient = new SupabaseStorageClient(STORAGE_URL, {
 - Replace an existing file at the specified path with a new one:
 
   ```js
-  const fileBody = ...; // load your file here
-  const { data, error } = await storageClient.from('bucket')
-  .update('path/to/file', fileBody);
+  const fileBody = ... // load your file here
+
+  const { data, error } = await storageClient
+    .from('bucket')
+    .update('path/to/file', fileBody)
   ```
 
   > Note: The `upload` method also accepts a map of optional parameters. For a complete list see the [Supabase API reference](https://supabase.com/docs/reference/javascript/storage-from-upload).
@@ -126,6 +128,7 @@ const storageClient = new SupabaseStorageClient(STORAGE_URL, {
 
   ```js
   const expireIn = 60
+  
   const { data, error } = await storageClient
     .from('bucket')
     .createSignedUrl('path/to/file', expireIn)
