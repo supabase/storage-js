@@ -61,7 +61,18 @@ export class StorageFileApi {
       | URLSearchParams
       | string,
     fileOptions?: FileOptions
-  ): Promise<{ data: { Key: string } | null; error: Error | null }> {
+  ): Promise<
+    | {
+        data: {
+          Key: string
+        }
+        error: null
+      }
+    | {
+        data: null
+        error: unknown
+      }
+  > {
     try {
       let body
       const options = { ...DEFAULT_FILE_OPTIONS, ...fileOptions }
@@ -128,7 +139,18 @@ export class StorageFileApi {
       | URLSearchParams
       | string,
     fileOptions?: FileOptions
-  ): Promise<{ data: { Key: string } | null; error: Error | null }> {
+  ): Promise<
+    | {
+        data: {
+          Key: string
+        }
+        error: null
+      }
+    | {
+        data: null
+        error: unknown
+      }
+  > {
     return this.uploadOrUpdate('POST', path, fileBody, fileOptions)
   }
 
@@ -156,7 +178,18 @@ export class StorageFileApi {
       | URLSearchParams
       | string,
     fileOptions?: FileOptions
-  ): Promise<{ data: { Key: string } | null; error: Error | null }> {
+  ): Promise<
+    | {
+        data: {
+          Key: string
+        }
+        error: null
+      }
+    | {
+        data: null
+        error: unknown
+      }
+  > {
     return this.uploadOrUpdate('PUT', path, fileBody, fileOptions)
   }
 
@@ -169,7 +202,16 @@ export class StorageFileApi {
   async move(
     fromPath: string,
     toPath: string
-  ): Promise<{ data: { message: string } | null; error: Error | null }> {
+  ): Promise<
+    | {
+        data: { message: string }
+        error: null
+      }
+    | {
+        data: null
+        error: unknown
+      }
+  > {
     try {
       const data = await post(
         this.fetch,
@@ -192,7 +234,16 @@ export class StorageFileApi {
   async copy(
     fromPath: string,
     toPath: string
-  ): Promise<{ data: { message: string } | null; error: Error | null }> {
+  ): Promise<
+    | {
+        data: { message: string }
+        error: null
+      }
+    | {
+        data: null
+        error: unknown
+      }
+  > {
     try {
       const data = await post(
         this.fetch,
@@ -215,11 +266,18 @@ export class StorageFileApi {
   async createSignedUrl(
     path: string,
     expiresIn: number
-  ): Promise<{
-    data: { signedURL: string } | null
-    error: Error | null
-    signedURL: string | null
-  }> {
+  ): Promise<
+    | {
+        data: { signedURL: string }
+        error: null
+        signedURL: string
+      }
+    | {
+        data: null
+        error: unknown
+        signedURL: null
+      }
+  > {
     try {
       const _path = this._getFinalPath(path)
       let data = await post(
@@ -245,10 +303,16 @@ export class StorageFileApi {
   async createSignedUrls(
     paths: string[],
     expiresIn: number
-  ): Promise<{
-    data: { error: string | null; path: string | null; signedURL: string }[] | null
-    error: Error | null
-  }> {
+  ): Promise<
+    | {
+        data: { error: string | null; path: string | null; signedURL: string }[]
+        error: null
+      }
+    | {
+        data: null
+        error: unknown
+      }
+  > {
     try {
       const data = await post(
         this.fetch,
@@ -273,7 +337,18 @@ export class StorageFileApi {
    *
    * @param path The file path to be downloaded, including the path and file name. For example `folder/image.png`.
    */
-  async download(path: string): Promise<{ data: Blob | null; error: Error | null }> {
+  async download(
+    path: string
+  ): Promise<
+    | {
+        data: Blob
+        error: null
+      }
+    | {
+        data: null
+        error: unknown
+      }
+  > {
     try {
       const _path = this._getFinalPath(path)
       const res = await get(this.fetch, `${this.url}/object/${_path}`, {
@@ -294,11 +369,19 @@ export class StorageFileApi {
    */
   getPublicUrl(
     path: string
-  ): {
-    data: { publicURL: string } | null
-    error: Error | null
-    publicURL: string | null
-  } {
+  ):
+    | {
+        data: {
+          publicURL: string
+        }
+        error: null
+        publicURL: string
+      }
+    | {
+        data: null
+        error: unknown
+        publicURL: null
+      } {
     try {
       const _path = this._getFinalPath(path)
       const publicURL = `${this.url}/object/public/${_path}`
@@ -314,7 +397,18 @@ export class StorageFileApi {
    *
    * @param paths An array of files to be deleted, including the path and file name. For example [`folder/image.png`].
    */
-  async remove(paths: string[]): Promise<{ data: FileObject[] | null; error: Error | null }> {
+  async remove(
+    paths: string[]
+  ): Promise<
+    | {
+        data: FileObject[]
+        error: null
+      }
+    | {
+        data: null
+        error: unknown
+      }
+  > {
     try {
       const data = await remove(
         this.fetch,
@@ -368,7 +462,16 @@ export class StorageFileApi {
     path?: string,
     options?: SearchOptions,
     parameters?: FetchParameters
-  ): Promise<{ data: FileObject[] | null; error: Error | null }> {
+  ): Promise<
+    | {
+        data: FileObject[]
+        error: null
+      }
+    | {
+        data: null
+        error: unknown
+      }
+  > {
     try {
       const body = { ...DEFAULT_SEARCH_OPTIONS, ...options, prefix: path || '' }
       const data = await post(

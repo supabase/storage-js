@@ -17,7 +17,16 @@ export class StorageBucketApi {
   /**
    * Retrieves the details of all Storage buckets within an existing product.
    */
-  async listBuckets(): Promise<{ data: Bucket[] | null; error: Error | null }> {
+  async listBuckets(): Promise<
+    | {
+        data: Bucket[]
+        error: null
+      }
+    | {
+        data: null
+        error: unknown
+      }
+  > {
     try {
       const data = await get(this.fetch, `${this.url}/bucket`, { headers: this.headers })
       return { data, error: null }
@@ -31,7 +40,18 @@ export class StorageBucketApi {
    *
    * @param id The unique identifier of the bucket you would like to retrieve.
    */
-  async getBucket(id: string): Promise<{ data: Bucket | null; error: Error | null }> {
+  async getBucket(
+    id: string
+  ): Promise<
+    | {
+        data: Bucket
+        error: null
+      }
+    | {
+        data: null
+        error: unknown
+      }
+  > {
     try {
       const data = await get(this.fetch, `${this.url}/bucket/${id}`, { headers: this.headers })
       return { data, error: null }
@@ -49,7 +69,16 @@ export class StorageBucketApi {
   async createBucket(
     id: string,
     options: { public: boolean } = { public: false }
-  ): Promise<{ data: string | null; error: Error | null }> {
+  ): Promise<
+    | {
+        data: string
+        error: null
+      }
+    | {
+        data: null
+        error: unknown
+      }
+  > {
     try {
       const data = await post(
         this.fetch,
@@ -71,7 +100,16 @@ export class StorageBucketApi {
   async updateBucket(
     id: string,
     options: { public: boolean }
-  ): Promise<{ data: { message: string } | null; error: Error | null }> {
+  ): Promise<
+    | {
+        data: { message: string }
+        error: null
+      }
+    | {
+        data: null
+        error: unknown
+      }
+  > {
     try {
       const data = await put(
         this.fetch,
@@ -92,7 +130,16 @@ export class StorageBucketApi {
    */
   async emptyBucket(
     id: string
-  ): Promise<{ data: { message: string } | null; error: Error | null }> {
+  ): Promise<
+    | {
+        data: { message: string }
+        error: null
+      }
+    | {
+        data: null
+        error: unknown
+      }
+  > {
     try {
       const data = await post(
         this.fetch,
@@ -114,7 +161,16 @@ export class StorageBucketApi {
    */
   async deleteBucket(
     id: string
-  ): Promise<{ data: { message: string } | null; error: Error | null }> {
+  ): Promise<
+    | {
+        data: { message: string }
+        error: null
+      }
+    | {
+        data: null
+        error: unknown
+      }
+  > {
     try {
       const data = await remove(
         this.fetch,
