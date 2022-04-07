@@ -70,7 +70,7 @@ export class StorageFileApi {
       }
     | {
         data: null
-        error: unknown
+        error: Error
       }
   > {
     try {
@@ -111,7 +111,11 @@ export class StorageFileApi {
         return { data: null, error }
       }
     } catch (error) {
-      return { data: null, error }
+      if (error instanceof Error) {
+        return { data: null, error }
+      }
+
+      throw error
     }
   }
 
@@ -148,7 +152,7 @@ export class StorageFileApi {
       }
     | {
         data: null
-        error: unknown
+        error: Error
       }
   > {
     return this.uploadOrUpdate('POST', path, fileBody, fileOptions)
@@ -187,7 +191,7 @@ export class StorageFileApi {
       }
     | {
         data: null
-        error: unknown
+        error: Error
       }
   > {
     return this.uploadOrUpdate('PUT', path, fileBody, fileOptions)
@@ -209,7 +213,7 @@ export class StorageFileApi {
       }
     | {
         data: null
-        error: unknown
+        error: Error
       }
   > {
     try {
@@ -221,7 +225,11 @@ export class StorageFileApi {
       )
       return { data, error: null }
     } catch (error) {
-      return { data: null, error }
+      if (error instanceof Error) {
+        return { data: null, error }
+      }
+
+      throw error
     }
   }
 
@@ -241,7 +249,7 @@ export class StorageFileApi {
       }
     | {
         data: null
-        error: unknown
+        error: Error
       }
   > {
     try {
@@ -253,7 +261,11 @@ export class StorageFileApi {
       )
       return { data, error: null }
     } catch (error) {
-      return { data: null, error }
+      if (error instanceof Error) {
+        return { data: null, error }
+      }
+
+      throw error
     }
   }
 
@@ -274,7 +286,7 @@ export class StorageFileApi {
       }
     | {
         data: null
-        error: unknown
+        error: Error
         signedURL: null
       }
   > {
@@ -290,7 +302,11 @@ export class StorageFileApi {
       data = { signedURL }
       return { data, error: null, signedURL }
     } catch (error) {
-      return { data: null, error, signedURL: null }
+      if (error instanceof Error) {
+        return { data: null, error, signedURL: null }
+      }
+
+      throw error
     }
   }
 
@@ -310,7 +326,7 @@ export class StorageFileApi {
       }
     | {
         data: null
-        error: unknown
+        error: Error
       }
   > {
     try {
@@ -328,7 +344,11 @@ export class StorageFileApi {
         error: null,
       }
     } catch (error) {
-      return { data: null, error }
+      if (error instanceof Error) {
+        return { data: null, error }
+      }
+
+      throw error
     }
   }
 
@@ -346,7 +366,7 @@ export class StorageFileApi {
       }
     | {
         data: null
-        error: unknown
+        error: Error
       }
   > {
     try {
@@ -358,7 +378,11 @@ export class StorageFileApi {
       const data = await res.blob()
       return { data, error: null }
     } catch (error) {
-      return { data: null, error }
+      if (error instanceof Error) {
+        return { data: null, error }
+      }
+
+      throw error
     }
   }
 
@@ -379,7 +403,7 @@ export class StorageFileApi {
       }
     | {
         data: null
-        error: unknown
+        error: Error
         publicURL: null
       } {
     try {
@@ -388,7 +412,11 @@ export class StorageFileApi {
       const data = { publicURL }
       return { data, error: null, publicURL }
     } catch (error) {
-      return { data: null, error, publicURL: null }
+      if (error instanceof Error) {
+        return { data: null, error, publicURL: null }
+      }
+
+      throw error
     }
   }
 
@@ -406,7 +434,7 @@ export class StorageFileApi {
       }
     | {
         data: null
-        error: unknown
+        error: Error
       }
   > {
     try {
@@ -418,7 +446,11 @@ export class StorageFileApi {
       )
       return { data, error: null }
     } catch (error) {
-      return { data: null, error }
+      if (error instanceof Error) {
+        return { data: null, error }
+      }
+
+      throw error
     }
   }
 
@@ -469,7 +501,7 @@ export class StorageFileApi {
       }
     | {
         data: null
-        error: unknown
+        error: Error
       }
   > {
     try {
@@ -483,7 +515,11 @@ export class StorageFileApi {
       )
       return { data, error: null }
     } catch (error) {
-      return { data: null, error }
+      if (error instanceof Error) {
+        return { data: null, error }
+      }
+
+      throw error
     }
   }
 

@@ -24,14 +24,18 @@ export class StorageBucketApi {
       }
     | {
         data: null
-        error: unknown
+        error: Error
       }
   > {
     try {
       const data = await get(this.fetch, `${this.url}/bucket`, { headers: this.headers })
       return { data, error: null }
     } catch (error) {
-      return { data: null, error }
+      if (error instanceof Error) {
+        return { data: null, error }
+      }
+
+      throw error
     }
   }
 
@@ -49,14 +53,18 @@ export class StorageBucketApi {
       }
     | {
         data: null
-        error: unknown
+        error: Error
       }
   > {
     try {
       const data = await get(this.fetch, `${this.url}/bucket/${id}`, { headers: this.headers })
       return { data, error: null }
     } catch (error) {
-      return { data: null, error }
+      if (error instanceof Error) {
+        return { data: null, error }
+      }
+
+      throw error
     }
   }
 
@@ -76,7 +84,7 @@ export class StorageBucketApi {
       }
     | {
         data: null
-        error: unknown
+        error: Error
       }
   > {
     try {
@@ -88,7 +96,11 @@ export class StorageBucketApi {
       )
       return { data: data.name, error: null }
     } catch (error) {
-      return { data: null, error }
+      if (error instanceof Error) {
+        return { data: null, error }
+      }
+
+      throw error
     }
   }
 
@@ -107,7 +119,7 @@ export class StorageBucketApi {
       }
     | {
         data: null
-        error: unknown
+        error: Error
       }
   > {
     try {
@@ -119,7 +131,11 @@ export class StorageBucketApi {
       )
       return { data, error: null }
     } catch (error) {
-      return { data: null, error }
+      if (error instanceof Error) {
+        return { data: null, error }
+      }
+
+      throw error
     }
   }
 
@@ -137,7 +153,7 @@ export class StorageBucketApi {
       }
     | {
         data: null
-        error: unknown
+        error: Error
       }
   > {
     try {
@@ -149,7 +165,11 @@ export class StorageBucketApi {
       )
       return { data, error: null }
     } catch (error) {
-      return { data: null, error }
+      if (error instanceof Error) {
+        return { data: null, error }
+      }
+
+      throw error
     }
   }
 
@@ -168,7 +188,7 @@ export class StorageBucketApi {
       }
     | {
         data: null
-        error: unknown
+        error: Error
       }
   > {
     try {
@@ -180,7 +200,11 @@ export class StorageBucketApi {
       )
       return { data, error: null }
     } catch (error) {
-      return { data: null, error }
+      if (error instanceof Error) {
+        return { data: null, error }
+      }
+
+      throw error
     }
   }
 }
