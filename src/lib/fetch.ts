@@ -1,3 +1,5 @@
+import { StorageApiError } from './errors'
+
 export type Fetch = typeof fetch
 
 export interface FetchOptions {
@@ -21,10 +23,7 @@ const handleError = (error: any, reject: any) => {
     return reject(error)
   }
   error.json().then((err: any) => {
-    return reject({
-      message: _getErrorMessage(err),
-      status: error?.status || 500,
-    })
+    return reject(new StorageApiError(_getErrorMessage(err), error?.status || 500))
   })
 }
 
@@ -57,7 +56,7 @@ async function _handleRequest(
     fetcher(url, _getRequestParams(method, options, parameters, body))
       .then((result) => {
         if (!result.ok) throw result
-        if (options?.noResolveJson) return resolve(result)
+        if (options?.noResolveJson) return result
         return result.json()
       })
       .then((data) => resolve(data))
