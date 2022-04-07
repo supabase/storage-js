@@ -1,4 +1,5 @@
 import { DEFAULT_HEADERS } from './constants'
+import { StorageApiError } from './errors'
 import { Fetch, get, post, put, remove } from './fetch'
 import { resolveFetch } from './helpers'
 import { Bucket } from './types'
@@ -24,14 +25,14 @@ export class StorageBucketApi {
       }
     | {
         data: null
-        error: Error
+        error: StorageApiError
       }
   > {
     try {
       const data = await get(this.fetch, `${this.url}/bucket`, { headers: this.headers })
       return { data, error: null }
     } catch (error) {
-      if (error instanceof Error) {
+      if (error instanceof StorageApiError) {
         return { data: null, error }
       }
 
@@ -53,14 +54,14 @@ export class StorageBucketApi {
       }
     | {
         data: null
-        error: Error
+        error: StorageApiError
       }
   > {
     try {
       const data = await get(this.fetch, `${this.url}/bucket/${id}`, { headers: this.headers })
       return { data, error: null }
     } catch (error) {
-      if (error instanceof Error) {
+      if (error instanceof StorageApiError) {
         return { data: null, error }
       }
 
@@ -84,7 +85,7 @@ export class StorageBucketApi {
       }
     | {
         data: null
-        error: Error
+        error: StorageApiError
       }
   > {
     try {
@@ -96,7 +97,7 @@ export class StorageBucketApi {
       )
       return { data: data.name, error: null }
     } catch (error) {
-      if (error instanceof Error) {
+      if (error instanceof StorageApiError) {
         return { data: null, error }
       }
 
@@ -119,7 +120,7 @@ export class StorageBucketApi {
       }
     | {
         data: null
-        error: Error
+        error: StorageApiError
       }
   > {
     try {
@@ -131,7 +132,7 @@ export class StorageBucketApi {
       )
       return { data, error: null }
     } catch (error) {
-      if (error instanceof Error) {
+      if (error instanceof StorageApiError) {
         return { data: null, error }
       }
 
@@ -153,7 +154,7 @@ export class StorageBucketApi {
       }
     | {
         data: null
-        error: Error
+        error: StorageApiError
       }
   > {
     try {
@@ -165,7 +166,7 @@ export class StorageBucketApi {
       )
       return { data, error: null }
     } catch (error) {
-      if (error instanceof Error) {
+      if (error instanceof StorageApiError) {
         return { data: null, error }
       }
 
@@ -188,7 +189,7 @@ export class StorageBucketApi {
       }
     | {
         data: null
-        error: Error
+        error: StorageApiError
       }
   > {
     try {
@@ -200,7 +201,7 @@ export class StorageBucketApi {
       )
       return { data, error: null }
     } catch (error) {
-      if (error instanceof Error) {
+      if (error instanceof StorageApiError) {
         return { data: null, error }
       }
 
