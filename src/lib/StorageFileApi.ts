@@ -297,12 +297,11 @@ export class StorageFileApi {
   ): {
     data: { publicURL: string }
     error: null
-    publicURL: string
   } {
     const _path = this._getFinalPath(path)
     const publicURL = `${this.url}/object/public/${_path}`
     const data = { publicURL }
-    return { data, error: null, publicURL }
+    return { data, error: null }
   }
 
   /**
@@ -311,7 +310,7 @@ export class StorageFileApi {
    * @param path The file path to be downloaded, including the path and file name. For example `folder/image.png`.
    */
   getPublicUrlAsString(path: string): string {
-    return this.getPublicUrl(path).publicURL
+    return this.getPublicUrl(path).data.publicURL
   }
 
   /**
