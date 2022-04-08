@@ -139,7 +139,10 @@ export class StorageFileApi {
       | URLSearchParams
       | string,
     fileOptions?: FileOptions
-  ): Promise<{ data: { Key: string; downloadPath: string } | null; error: Error | null }> {
+  ): Promise<{
+    data: { Key: string; downloadPath: string; bucketId?: string } | null
+    error: Error | null
+  }> {
     return this.uploadOrUpdate('POST', path, fileBody, fileOptions)
   }
 
@@ -167,7 +170,10 @@ export class StorageFileApi {
       | URLSearchParams
       | string,
     fileOptions?: FileOptions
-  ): Promise<{ data: { Key: string; downloadPath: string } | null; error: Error | null }> {
+  ): Promise<{
+    data: { Key: string; downloadPath: string; bucketId?: string } | null
+    error: Error | null
+  }> {
     return this.uploadOrUpdate('PUT', path, fileBody, fileOptions)
   }
 
