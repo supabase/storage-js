@@ -297,11 +297,12 @@ export class StorageFileApi {
   ): {
     data: { publicURL: string }
     error: null
+    publicURL: string
   } {
     const _path = this._getFinalPath(path)
     const publicURL = `${this.url}/object/public/${_path}`
     const data = { publicURL }
-    return { data, error: null }
+    return { data, error: null, publicURL }
   }
 
   /**
