@@ -84,13 +84,12 @@ const storageClient = new SupabaseStorageClient(STORAGE_URL, {
 
   > Note:  
   > The path in `data.key` is prefixed by the bucket ID and is not the value which should be passed to the `download` method in order to fetch the file.  
-  > To fetch the file via the `download` method, use `data.downloadPath`.  
-  > Example:
+  > To fetch the file via the `download` method, use `data.downloadPath` and `data.bucketId` as follows:
   >
   > ```javascript
   > const { data, error } = await storageClient.from('bucket').upload('/folder/file.txt', fileBody)
   > // check for errors
-  > const { data2, error2 } = await storageClient.from('bucket').download(data.downloadPath)
+  > const { data2, error2 } = await storageClient.from(data.bucketId).download(data.downloadPath)
   > ```
 
   > Note: The `upload` method also accepts a map of optional parameters. For a complete list see the [Supabase API reference](https://supabase.com/docs/reference/javascript/storage-from-upload).
