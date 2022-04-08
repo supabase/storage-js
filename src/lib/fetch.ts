@@ -1,4 +1,5 @@
-import { StorageApiError } from './errors'
+import { StorageApiError, StorageUnknownError } from './errors'
+import { resolveResponse } from './helpers'
 
 export type Fetch = typeof fetch
 
@@ -18,13 +19,16 @@ export type RequestMethodType = 'GET' | 'POST' | 'PUT' | 'DELETE'
 const _getErrorMessage = (err: any): string =>
   err.msg || err.message || err.error_description || err.error || JSON.stringify(err)
 
-const handleError = (error: any, reject: any) => {
-  if (typeof error.json !== 'function') {
-    return reject(error)
+const handleError = (error: unknown, reject: (reason?: any) => void) => {
+  const Res = resolveResponse()
+
+  if (error instanceof Res) {
+    error.json().then((err) => {
+      reject(new StorageApiError(_getErrorMessage(err), error.status || 500))
+    })
+  } else {
+    reject(new StorageUnknownError(_getErrorMessage(error), error))
   }
-  error.json().then((err: any) => {
-    return reject(new StorageApiError(_getErrorMessage(err), error?.status || 500))
-  })
 }
 
 const _getRequestParams = (

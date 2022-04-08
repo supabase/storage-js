@@ -1,4 +1,4 @@
-import { StorageApiError } from './errors'
+import { StorageError } from './errors'
 import { Fetch, FetchParameters, get, post, remove } from './fetch'
 import { resolveFetch } from './helpers'
 import { FileObject, FileOptions, SearchOptions } from './types'
@@ -71,7 +71,7 @@ export class StorageFileApi {
       }
     | {
         data: null
-        error: StorageApiError
+        error: StorageError
       }
   > {
     try {
@@ -112,7 +112,7 @@ export class StorageFileApi {
         return { data: null, error }
       }
     } catch (error) {
-      if (error instanceof StorageApiError) {
+      if (error instanceof StorageError) {
         return { data: null, error }
       }
 
@@ -153,7 +153,7 @@ export class StorageFileApi {
       }
     | {
         data: null
-        error: StorageApiError
+        error: StorageError
       }
   > {
     return this.uploadOrUpdate('POST', path, fileBody, fileOptions)
@@ -192,7 +192,7 @@ export class StorageFileApi {
       }
     | {
         data: null
-        error: StorageApiError
+        error: StorageError
       }
   > {
     return this.uploadOrUpdate('PUT', path, fileBody, fileOptions)
@@ -214,7 +214,7 @@ export class StorageFileApi {
       }
     | {
         data: null
-        error: StorageApiError
+        error: StorageError
       }
   > {
     try {
@@ -226,7 +226,7 @@ export class StorageFileApi {
       )
       return { data, error: null }
     } catch (error) {
-      if (error instanceof StorageApiError) {
+      if (error instanceof StorageError) {
         return { data: null, error }
       }
 
@@ -250,7 +250,7 @@ export class StorageFileApi {
       }
     | {
         data: null
-        error: StorageApiError
+        error: StorageError
       }
   > {
     try {
@@ -262,7 +262,7 @@ export class StorageFileApi {
       )
       return { data, error: null }
     } catch (error) {
-      if (error instanceof StorageApiError) {
+      if (error instanceof StorageError) {
         return { data: null, error }
       }
 
@@ -287,7 +287,7 @@ export class StorageFileApi {
       }
     | {
         data: null
-        error: StorageApiError
+        error: StorageError
         signedURL: null
       }
   > {
@@ -303,7 +303,7 @@ export class StorageFileApi {
       data = { signedURL }
       return { data, error: null, signedURL }
     } catch (error) {
-      if (error instanceof StorageApiError) {
+      if (error instanceof StorageError) {
         return { data: null, error, signedURL: null }
       }
 
@@ -327,7 +327,7 @@ export class StorageFileApi {
       }
     | {
         data: null
-        error: StorageApiError
+        error: StorageError
       }
   > {
     try {
@@ -345,7 +345,7 @@ export class StorageFileApi {
         error: null,
       }
     } catch (error) {
-      if (error instanceof StorageApiError) {
+      if (error instanceof StorageError) {
         return { data: null, error }
       }
 
@@ -367,7 +367,7 @@ export class StorageFileApi {
       }
     | {
         data: null
-        error: StorageApiError
+        error: StorageError
       }
   > {
     try {
@@ -379,7 +379,7 @@ export class StorageFileApi {
       const data = await res.blob()
       return { data, error: null }
     } catch (error) {
-      if (error instanceof StorageApiError) {
+      if (error instanceof StorageError) {
         return { data: null, error }
       }
 
@@ -404,7 +404,7 @@ export class StorageFileApi {
       }
     | {
         data: null
-        error: StorageApiError
+        error: StorageError
         publicURL: null
       } {
     try {
@@ -413,7 +413,7 @@ export class StorageFileApi {
       const data = { publicURL }
       return { data, error: null, publicURL }
     } catch (error) {
-      if (error instanceof StorageApiError) {
+      if (error instanceof StorageError) {
         return { data: null, error, publicURL: null }
       }
 
@@ -435,7 +435,7 @@ export class StorageFileApi {
       }
     | {
         data: null
-        error: StorageApiError
+        error: StorageError
       }
   > {
     try {
@@ -447,7 +447,7 @@ export class StorageFileApi {
       )
       return { data, error: null }
     } catch (error) {
-      if (error instanceof StorageApiError) {
+      if (error instanceof StorageError) {
         return { data: null, error }
       }
 
@@ -459,12 +459,27 @@ export class StorageFileApi {
    * Get file metadata
    * @param id the file id to retrieve metadata
    */
-  // async getMetadata(id: string): Promise<{ data: Metadata | null; error: StorageApiError | null }> {
+  // async getMetadata(
+  //   id: string
+  // ): Promise<
+  //   | {
+  //       data: Metadata
+  //       error: null
+  //     }
+  //   | {
+  //       data: null
+  //       error: StorageError
+  //     }
+  // > {
   //   try {
-  //     const data = await get(`${this.url}/metadata/${id}`, { headers: this.headers })
+  //     const data = await get(this.fetch, `${this.url}/metadata/${id}`, { headers: this.headers })
   //     return { data, error: null }
   //   } catch (error) {
-  //     return { data: null, error }
+  //     if (error instanceof StorageError) {
+  //       return { data: null, error }
+  //     }
+
+  //     throw error
   //   }
   // }
 
@@ -476,12 +491,30 @@ export class StorageFileApi {
   // async updateMetadata(
   //   id: string,
   //   meta: Metadata
-  // ): Promise<{ data: Metadata | null; error: StorageApiError | null }> {
+  // ): Promise<
+  //   | {
+  //       data: Metadata
+  //       error: null
+  //     }
+  //   | {
+  //       data: null
+  //       error: StorageError
+  //     }
+  // > {
   //   try {
-  //     const data = await post(`${this.url}/metadata/${id}`, { ...meta }, { headers: this.headers })
+  //     const data = await post(
+  //       this.fetch,
+  //       `${this.url}/metadata/${id}`,
+  //       { ...meta },
+  //       { headers: this.headers }
+  //     )
   //     return { data, error: null }
   //   } catch (error) {
-  //     return { data: null, error }
+  //     if (error instanceof StorageError) {
+  //       return { data: null, error }
+  //     }
+
+  //     throw error
   //   }
   // }
 
@@ -502,7 +535,7 @@ export class StorageFileApi {
       }
     | {
         data: null
-        error: StorageApiError
+        error: StorageError
       }
   > {
     try {
@@ -516,7 +549,7 @@ export class StorageFileApi {
       )
       return { data, error: null }
     } catch (error) {
-      if (error instanceof StorageApiError) {
+      if (error instanceof StorageError) {
         return { data: null, error }
       }
 
