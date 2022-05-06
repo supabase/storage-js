@@ -83,7 +83,7 @@ const storageClient = new SupabaseStorageClient(STORAGE_URL, {
   ```
 
   > Note:  
-  > The path in `data.key` is prefixed by the bucket ID and is not the value which should be passed to the `download` method in order to fetch the file.  
+  > The path in `data.Key` is prefixed by the bucket ID and is not the value which should be passed to the `download` method in order to fetch the file.  
   > To fetch the file via the `download` method, use `data.downloadPath` and `data.bucketId` as follows:
   >
   > ```javascript
