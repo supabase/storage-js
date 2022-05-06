@@ -63,7 +63,7 @@ export class StorageFileApi {
       | string,
     fileOptions?: FileOptions
   ): Promise<{
-    data: { Key: string; downloadPath: string; bucketId?: string } | null
+    data: { Key: string; path: string; bucketId?: string } | null
     error: Error | null
   }> {
     try {
@@ -99,7 +99,7 @@ export class StorageFileApi {
         // const data = await res.json()
         // temporary fix till backend is updated to the latest storage-api version
         return {
-          data: { Key: _path, downloadPath: cleanPath, bucketId: this.bucketId },
+          data: { Key: _path, path: cleanPath, bucketId: this.bucketId },
           error: null,
         }
       } else {
@@ -140,7 +140,7 @@ export class StorageFileApi {
       | string,
     fileOptions?: FileOptions
   ): Promise<{
-    data: { Key: string; downloadPath: string; bucketId?: string } | null
+    data: { Key: string; path: string; bucketId?: string } | null
     error: Error | null
   }> {
     return this.uploadOrUpdate('POST', path, fileBody, fileOptions)
@@ -171,7 +171,7 @@ export class StorageFileApi {
       | string,
     fileOptions?: FileOptions
   ): Promise<{
-    data: { Key: string; downloadPath: string; bucketId?: string } | null
+    data: { Key: string; path: string; bucketId?: string } | null
     error: Error | null
   }> {
     return this.uploadOrUpdate('PUT', path, fileBody, fileOptions)
