@@ -13,3 +13,5 @@ export const resolveFetch = (customFetch?: Fetch): Fetch => {
   }
   return (...args) => _fetch(...args)
 }
+
+export const noopPromise = () => Promise.resolve({})

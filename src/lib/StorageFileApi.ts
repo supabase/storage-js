@@ -1,5 +1,5 @@
 import { Fetch, FetchParameters, get, post, remove } from './fetch'
-import { resolveFetch } from './helpers'
+import { noopPromise, resolveFetch } from './helpers'
 import { FileObject, FileOptions, SearchOptions } from './types'
 
 const DEFAULT_SEARCH_OPTIONS = {
@@ -19,18 +19,18 @@ const DEFAULT_FILE_OPTIONS: FileOptions = {
 
 export class StorageFileApi {
   protected url: string
-  protected headers: { [key: string]: string }
+  protected getHeaders: () => Promise<{ [key: string]: string }> | { [key: string]: string }
   protected bucketId?: string
   protected fetch: Fetch
 
   constructor(
     url: string,
-    headers: { [key: string]: string } = {},
+    getHeaders: () => Promise<{ [key: string]: string }> | { [key: string]: string } = noopPromise,
     bucketId?: string,
     fetch?: Fetch
   ) {
     this.url = url
-    this.headers = headers
+    this.getHeaders = getHeaders
     this.bucketId = bucketId
     this.fetch = resolveFetch(fetch)
   }
@@ -66,7 +66,7 @@ export class StorageFileApi {
       let body
       const options = { ...DEFAULT_FILE_OPTIONS, ...fileOptions }
       const headers: Record<string, string> = {
-        ...this.headers,
+        ...(await this.getHeaders()),
         ...(method === 'POST' && { 'x-upsert': String(options.upsert as boolean) }),
       }
 
@@ -175,7 +175,7 @@ export class StorageFileApi {
         this.fetch,
         `${this.url}/object/move`,
         { bucketId: this.bucketId, sourceKey: fromPath, destinationKey: toPath },
-        { headers: this.headers }
+        { headers: await this.getHeaders() }
       )
       return { data, error: null }
     } catch (error) {
@@ -198,7 +198,7 @@ export class StorageFileApi {
         this.fetch,
         `${this.url}/object/copy`,
         { bucketId: this.bucketId, sourceKey: fromPath, destinationKey: toPath },
-        { headers: this.headers }
+        { headers: await this.getHeaders() }
       )
       return { data, error: null }
     } catch (error) {
@@ -226,7 +226,7 @@ export class StorageFileApi {
         this.fetch,
         `${this.url}/object/sign/${_path}`,
         { expiresIn },
-        { headers: this.headers }
+        { headers: await this.getHeaders() }
       )
       const signedURL = `${this.url}${data.signedURL}`
       data = { signedURL }
@@ -254,7 +254,7 @@ export class StorageFileApi {
         this.fetch,
         `${this.url}/object/sign/${this.bucketId}`,
         { expiresIn, paths },
-        { headers: this.headers }
+        { headers: await this.getHeaders() }
       )
       return {
         data: data.map((datum: { signedURL: string }) => ({
@@ -277,7 +277,7 @@ export class StorageFileApi {
     try {
       const _path = this._getFinalPath(path)
       const res = await get(this.fetch, `${this.url}/object/${_path}`, {
-        headers: this.headers,
+        headers: await this.getHeaders(),
         noResolveJson: true,
       })
       const data = await res.blob()
@@ -320,7 +320,7 @@ export class StorageFileApi {
         this.fetch,
         `${this.url}/object/${this.bucketId}`,
         { prefixes: paths },
-        { headers: this.headers }
+        { headers: await this.getHeaders() }
       )
       return { data, error: null }
     } catch (error) {
@@ -334,7 +334,7 @@ export class StorageFileApi {
    */
   // async getMetadata(id: string): Promise<{ data: Metadata | null; error: Error | null }> {
   //   try {
-  //     const data = await get(`${this.url}/metadata/${id}`, { headers: this.headers })
+  //     const data = await get(`${this.url}/metadata/${id}`, { headers: await this.getHeaders() })
   //     return { data, error: null }
   //   } catch (error) {
   //     return { data: null, error }
@@ -351,7 +351,7 @@ export class StorageFileApi {
   //   meta: Metadata
   // ): Promise<{ data: Metadata | null; error: Error | null }> {
   //   try {
-  //     const data = await post(`${this.url}/metadata/${id}`, { ...meta }, { headers: this.headers })
+  //     const data = await post(`${this.url}/metadata/${id}`, { ...meta }, { headers: await this.getHeaders() })
   //     return { data, error: null }
   //   } catch (error) {
   //     return { data: null, error }
@@ -375,7 +375,7 @@ export class StorageFileApi {
         this.fetch,
         `${this.url}/object/list/${this.bucketId}`,
         body,
-        { headers: this.headers },
+        { headers: await this.getHeaders() },
         parameters
       )
       return { data, error: null }

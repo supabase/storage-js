@@ -1,16 +1,24 @@
 import { DEFAULT_HEADERS } from './constants'
 import { Fetch, get, post, put, remove } from './fetch'
-import { resolveFetch } from './helpers'
+import { noopPromise, resolveFetch } from './helpers'
 import { Bucket } from './types'
 
 export class StorageBucketApi {
   protected url: string
-  protected headers: { [key: string]: string }
+  protected getHeaders: () => Promise<{ [key: string]: string }> | { [key: string]: string }
   protected fetch: Fetch
 
-  constructor(url: string, headers: { [key: string]: string } = {}, fetch?: Fetch) {
+  constructor(
+    url: string,
+    getHeaders: () => Promise<{ [key: string]: string }> | { [key: string]: string } = noopPromise,
+    fetch?: Fetch
+  ) {
     this.url = url
-    this.headers = { ...DEFAULT_HEADERS, ...headers }
+    this.getHeaders = async () => {
+      const headers = await Promise.resolve(getHeaders())
+
+      return { ...DEFAULT_HEADERS, ...headers }
+    }
     this.fetch = resolveFetch(fetch)
   }
 
@@ -19,7 +27,7 @@ export class StorageBucketApi {
    */
   async listBuckets(): Promise<{ data: Bucket[] | null; error: Error | null }> {
     try {
-      const data = await get(this.fetch, `${this.url}/bucket`, { headers: this.headers })
+      const data = await get(this.fetch, `${this.url}/bucket`, { headers: await this.getHeaders() })
       return { data, error: null }
     } catch (error) {
       return { data: null, error }
@@ -33,7 +41,9 @@ export class StorageBucketApi {
    */
   async getBucket(id: string): Promise<{ data: Bucket | null; error: Error | null }> {
     try {
-      const data = await get(this.fetch, `${this.url}/bucket/${id}`, { headers: this.headers })
+      const data = await get(this.fetch, `${this.url}/bucket/${id}`, {
+        headers: await this.getHeaders(),
+      })
       return { data, error: null }
     } catch (error) {
       return { data: null, error }
@@ -55,7 +65,7 @@ export class StorageBucketApi {
         this.fetch,
         `${this.url}/bucket`,
         { id, name: id, public: options.public },
-        { headers: this.headers }
+        { headers: await this.getHeaders() }
       )
       return { data: data.name, error: null }
     } catch (error) {
@@ -77,7 +87,7 @@ export class StorageBucketApi {
         this.fetch,
         `${this.url}/bucket/${id}`,
         { id, name: id, public: options.public },
-        { headers: this.headers }
+        { headers: await this.getHeaders() }
       )
       return { data, error: null }
     } catch (error) {
@@ -98,7 +108,7 @@ export class StorageBucketApi {
         this.fetch,
         `${this.url}/bucket/${id}/empty`,
         {},
-        { headers: this.headers }
+        { headers: await this.getHeaders() }
       )
       return { data, error: null }
     } catch (error) {
@@ -120,7 +130,7 @@ export class StorageBucketApi {
         this.fetch,
         `${this.url}/bucket/${id}`,
         {},
-        { headers: this.headers }
+        { headers: await this.getHeaders() }
       )
       return { data, error: null }
     } catch (error) {
