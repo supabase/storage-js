@@ -1,4 +1,10 @@
 export class StorageError extends Error {
+  protected __isStorageError = true
+
+  static isStorageError(error: unknown): error is StorageError {
+    return typeof error === 'object' && error !== null && '__isStorageError' in error
+  }
+
   constructor(message: string) {
     super(message)
     this.name = 'StorageError'

@@ -32,7 +32,7 @@ export class StorageBucketApi {
       const data = await get(this.fetch, `${this.url}/bucket`, { headers: this.headers })
       return { data, error: null }
     } catch (error) {
-      if (error instanceof StorageError) {
+      if (StorageError.isStorageError(error)) {
         return { data: null, error }
       }
 
@@ -61,7 +61,7 @@ export class StorageBucketApi {
       const data = await get(this.fetch, `${this.url}/bucket/${id}`, { headers: this.headers })
       return { data, error: null }
     } catch (error) {
-      if (error instanceof StorageError) {
+      if (StorageError.isStorageError(error)) {
         return { data: null, error }
       }
 
@@ -97,7 +97,7 @@ export class StorageBucketApi {
       )
       return { data: data.name, error: null }
     } catch (error) {
-      if (error instanceof StorageError) {
+      if (StorageError.isStorageError(error)) {
         return { data: null, error }
       }
 
@@ -132,7 +132,7 @@ export class StorageBucketApi {
       )
       return { data, error: null }
     } catch (error) {
-      if (error instanceof StorageError) {
+      if (StorageError.isStorageError(error)) {
         return { data: null, error }
       }
 
@@ -166,7 +166,7 @@ export class StorageBucketApi {
       )
       return { data, error: null }
     } catch (error) {
-      if (error instanceof StorageError) {
+      if (StorageError.isStorageError(error)) {
         return { data: null, error }
       }
 
@@ -201,7 +201,7 @@ export class StorageBucketApi {
       )
       return { data, error: null }
     } catch (error) {
-      if (error instanceof StorageError) {
+      if (StorageError.isStorageError(error)) {
         return { data: null, error }
       }
 
