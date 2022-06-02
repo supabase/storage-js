@@ -1,5 +1,5 @@
 import { DEFAULT_HEADERS } from './constants'
-import { StorageError } from './errors'
+import { isStorageError, StorageError } from './errors'
 import { Fetch, get, post, put, remove } from './fetch'
 import { resolveFetch } from './helpers'
 import { Bucket } from './types'
@@ -32,7 +32,7 @@ export class StorageBucketApi {
       const data = await get(this.fetch, `${this.url}/bucket`, { headers: this.headers })
       return { data, error: null }
     } catch (error) {
-      if (StorageError.isStorageError(error)) {
+      if (isStorageError(error)) {
         return { data: null, error }
       }
 
@@ -61,7 +61,7 @@ export class StorageBucketApi {
       const data = await get(this.fetch, `${this.url}/bucket/${id}`, { headers: this.headers })
       return { data, error: null }
     } catch (error) {
-      if (StorageError.isStorageError(error)) {
+      if (isStorageError(error)) {
         return { data: null, error }
       }
 
@@ -97,7 +97,7 @@ export class StorageBucketApi {
       )
       return { data: data.name, error: null }
     } catch (error) {
-      if (StorageError.isStorageError(error)) {
+      if (isStorageError(error)) {
         return { data: null, error }
       }
 
@@ -132,7 +132,7 @@ export class StorageBucketApi {
       )
       return { data, error: null }
     } catch (error) {
-      if (StorageError.isStorageError(error)) {
+      if (isStorageError(error)) {
         return { data: null, error }
       }
 
@@ -166,7 +166,7 @@ export class StorageBucketApi {
       )
       return { data, error: null }
     } catch (error) {
-      if (StorageError.isStorageError(error)) {
+      if (isStorageError(error)) {
         return { data: null, error }
       }
 
@@ -201,7 +201,7 @@ export class StorageBucketApi {
       )
       return { data, error: null }
     } catch (error) {
-      if (StorageError.isStorageError(error)) {
+      if (isStorageError(error)) {
         return { data: null, error }
       }
 

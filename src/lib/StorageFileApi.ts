@@ -1,4 +1,4 @@
-import { StorageError } from './errors'
+import { isStorageError, StorageError } from './errors'
 import { Fetch, FetchParameters, get, post, remove } from './fetch'
 import { resolveFetch } from './helpers'
 import { FileObject, FileOptions, SearchOptions } from './types'
@@ -112,7 +112,7 @@ export class StorageFileApi {
         return { data: null, error }
       }
     } catch (error) {
-      if (StorageError.isStorageError(error)) {
+      if (isStorageError(error)) {
         return { data: null, error }
       }
 
@@ -226,7 +226,7 @@ export class StorageFileApi {
       )
       return { data, error: null }
     } catch (error) {
-      if (StorageError.isStorageError(error)) {
+      if (isStorageError(error)) {
         return { data: null, error }
       }
 
@@ -262,7 +262,7 @@ export class StorageFileApi {
       )
       return { data, error: null }
     } catch (error) {
-      if (StorageError.isStorageError(error)) {
+      if (isStorageError(error)) {
         return { data: null, error }
       }
 
@@ -303,7 +303,7 @@ export class StorageFileApi {
       data = { signedURL }
       return { data, error: null, signedURL }
     } catch (error) {
-      if (StorageError.isStorageError(error)) {
+      if (isStorageError(error)) {
         return { data: null, error, signedURL: null }
       }
 
@@ -345,7 +345,7 @@ export class StorageFileApi {
         error: null,
       }
     } catch (error) {
-      if (StorageError.isStorageError(error)) {
+      if (isStorageError(error)) {
         return { data: null, error }
       }
 
@@ -379,7 +379,7 @@ export class StorageFileApi {
       const data = await res.blob()
       return { data, error: null }
     } catch (error) {
-      if (StorageError.isStorageError(error)) {
+      if (isStorageError(error)) {
         return { data: null, error }
       }
 
@@ -413,7 +413,7 @@ export class StorageFileApi {
       const data = { publicURL }
       return { data, error: null, publicURL }
     } catch (error) {
-      if (StorageError.isStorageError(error)) {
+      if (isStorageError(error)) {
         return { data: null, error, publicURL: null }
       }
 
@@ -447,7 +447,7 @@ export class StorageFileApi {
       )
       return { data, error: null }
     } catch (error) {
-      if (StorageError.isStorageError(error)) {
+      if (isStorageError(error)) {
         return { data: null, error }
       }
 
@@ -475,7 +475,7 @@ export class StorageFileApi {
   //     const data = await get(this.fetch, `${this.url}/metadata/${id}`, { headers: this.headers })
   //     return { data, error: null }
   //   } catch (error) {
-  //     if (StorageError.isStorageError(error)) {
+  //     if (isStorageError(error)) {
   //       return { data: null, error }
   //     }
 
@@ -510,7 +510,7 @@ export class StorageFileApi {
   //     )
   //     return { data, error: null }
   //   } catch (error) {
-  //     if (StorageError.isStorageError(error)) {
+  //     if (isStorageError(error)) {
   //       return { data: null, error }
   //     }
 
@@ -549,7 +549,7 @@ export class StorageFileApi {
       )
       return { data, error: null }
     } catch (error) {
-      if (StorageError.isStorageError(error)) {
+      if (isStorageError(error)) {
         return { data: null, error }
       }
 
