@@ -1,4 +1,5 @@
 import { DEFAULT_HEADERS } from './constants'
+import { isStorageError, StorageError } from './errors'
 import { Fetch, get, post, put, remove } from './fetch'
 import { resolveFetch } from './helpers'
 import { Bucket } from './types'
@@ -17,12 +18,25 @@ export class StorageBucketApi {
   /**
    * Retrieves the details of all Storage buckets within an existing project.
    */
-  async listBuckets(): Promise<{ data: Bucket[] | null; error: Error | null }> {
+  async listBuckets(): Promise<
+    | {
+        data: Bucket[]
+        error: null
+      }
+    | {
+        data: null
+        error: StorageError
+      }
+  > {
     try {
       const data = await get(this.fetch, `${this.url}/bucket`, { headers: this.headers })
       return { data, error: null }
     } catch (error) {
-      return { data: null, error }
+      if (isStorageError(error)) {
+        return { data: null, error }
+      }
+
+      throw error
     }
   }
 
@@ -31,12 +45,27 @@ export class StorageBucketApi {
    *
    * @param id The unique identifier of the bucket you would like to retrieve.
    */
-  async getBucket(id: string): Promise<{ data: Bucket | null; error: Error | null }> {
+  async getBucket(
+    id: string
+  ): Promise<
+    | {
+        data: Bucket
+        error: null
+      }
+    | {
+        data: null
+        error: StorageError
+      }
+  > {
     try {
       const data = await get(this.fetch, `${this.url}/bucket/${id}`, { headers: this.headers })
       return { data, error: null }
     } catch (error) {
-      return { data: null, error }
+      if (isStorageError(error)) {
+        return { data: null, error }
+      }
+
+      throw error
     }
   }
 
@@ -49,7 +78,16 @@ export class StorageBucketApi {
   async createBucket(
     id: string,
     options: { public: boolean } = { public: false }
-  ): Promise<{ data: string | null; error: Error | null }> {
+  ): Promise<
+    | {
+        data: string
+        error: null
+      }
+    | {
+        data: null
+        error: StorageError
+      }
+  > {
     try {
       const data = await post(
         this.fetch,
@@ -59,7 +97,11 @@ export class StorageBucketApi {
       )
       return { data: data.name, error: null }
     } catch (error) {
-      return { data: null, error }
+      if (isStorageError(error)) {
+        return { data: null, error }
+      }
+
+      throw error
     }
   }
 
@@ -71,7 +113,16 @@ export class StorageBucketApi {
   async updateBucket(
     id: string,
     options: { public: boolean }
-  ): Promise<{ data: { message: string } | null; error: Error | null }> {
+  ): Promise<
+    | {
+        data: { message: string }
+        error: null
+      }
+    | {
+        data: null
+        error: StorageError
+      }
+  > {
     try {
       const data = await put(
         this.fetch,
@@ -81,7 +132,11 @@ export class StorageBucketApi {
       )
       return { data, error: null }
     } catch (error) {
-      return { data: null, error }
+      if (isStorageError(error)) {
+        return { data: null, error }
+      }
+
+      throw error
     }
   }
 
@@ -92,7 +147,16 @@ export class StorageBucketApi {
    */
   async emptyBucket(
     id: string
-  ): Promise<{ data: { message: string } | null; error: Error | null }> {
+  ): Promise<
+    | {
+        data: { message: string }
+        error: null
+      }
+    | {
+        data: null
+        error: StorageError
+      }
+  > {
     try {
       const data = await post(
         this.fetch,
@@ -102,7 +166,11 @@ export class StorageBucketApi {
       )
       return { data, error: null }
     } catch (error) {
-      return { data: null, error }
+      if (isStorageError(error)) {
+        return { data: null, error }
+      }
+
+      throw error
     }
   }
 
@@ -114,7 +182,16 @@ export class StorageBucketApi {
    */
   async deleteBucket(
     id: string
-  ): Promise<{ data: { message: string } | null; error: Error | null }> {
+  ): Promise<
+    | {
+        data: { message: string }
+        error: null
+      }
+    | {
+        data: null
+        error: StorageError
+      }
+  > {
     try {
       const data = await remove(
         this.fetch,
@@ -124,7 +201,11 @@ export class StorageBucketApi {
       )
       return { data, error: null }
     } catch (error) {
-      return { data: null, error }
+      if (isStorageError(error)) {
+        return { data: null, error }
+      }
+
+      throw error
     }
   }
 }

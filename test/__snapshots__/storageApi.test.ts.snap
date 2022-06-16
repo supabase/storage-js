@@ -48,12 +48,7 @@ Object {
 }
 `;
 
-exports[`Get bucket with wrong id 1`] = `
-Object {
-  "message": "The resource was not found",
-  "status": 400,
-}
-`;
+exports[`Get bucket with wrong id 1`] = `[StorageApiError: The resource was not found]`;
 
 exports[`delete bucket 1`] = `
 Object {

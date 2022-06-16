@@ -1,3 +1,6 @@
+import { StorageApiError, StorageUnknownError } from './errors'
+import { resolveResponse } from './helpers'
+
 export type Fetch = typeof fetch
 
 export interface FetchOptions {
@@ -16,16 +19,16 @@ export type RequestMethodType = 'GET' | 'POST' | 'PUT' | 'DELETE'
 const _getErrorMessage = (err: any): string =>
   err.msg || err.message || err.error_description || err.error || JSON.stringify(err)
 
-const handleError = (error: any, reject: any) => {
-  if (typeof error.json !== 'function') {
-    return reject(error)
-  }
-  error.json().then((err: any) => {
-    return reject({
-      message: _getErrorMessage(err),
-      status: error?.status || 500,
+const handleError = (error: unknown, reject: (reason?: any) => void) => {
+  const Res = resolveResponse()
+
+  if (error instanceof Res) {
+    error.json().then((err) => {
+      reject(new StorageApiError(_getErrorMessage(err), error.status || 500))
     })
-  })
+  } else {
+    reject(new StorageUnknownError(_getErrorMessage(error), error))
+  }
 }
 
 const _getRequestParams = (
@@ -57,7 +60,7 @@ async function _handleRequest(
     fetcher(url, _getRequestParams(method, options, parameters, body))
       .then((result) => {
         if (!result.ok) throw result
-        if (options?.noResolveJson) return resolve(result)
+        if (options?.noResolveJson) return result
         return result.json()
       })
       .then((data) => resolve(data))

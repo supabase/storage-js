@@ -1,3 +1,4 @@
+import { isStorageError, StorageError } from './errors'
 import { Fetch, FetchParameters, get, post, remove } from './fetch'
 import { resolveFetch } from './helpers'
 import { FileObject, FileOptions, SearchOptions } from './types'
@@ -61,7 +62,18 @@ export class StorageFileApi {
       | URLSearchParams
       | string,
     fileOptions?: FileOptions
-  ): Promise<{ data: { Key: string } | null; error: Error | null }> {
+  ): Promise<
+    | {
+        data: {
+          Key: string
+        }
+        error: null
+      }
+    | {
+        data: null
+        error: StorageError
+      }
+  > {
     try {
       let body
       const options = { ...DEFAULT_FILE_OPTIONS, ...fileOptions }
@@ -100,7 +112,11 @@ export class StorageFileApi {
         return { data: null, error }
       }
     } catch (error) {
-      return { data: null, error }
+      if (isStorageError(error)) {
+        return { data: null, error }
+      }
+
+      throw error
     }
   }
 
@@ -128,7 +144,18 @@ export class StorageFileApi {
       | URLSearchParams
       | string,
     fileOptions?: FileOptions
-  ): Promise<{ data: { Key: string } | null; error: Error | null }> {
+  ): Promise<
+    | {
+        data: {
+          Key: string
+        }
+        error: null
+      }
+    | {
+        data: null
+        error: StorageError
+      }
+  > {
     return this.uploadOrUpdate('POST', path, fileBody, fileOptions)
   }
 
@@ -156,7 +183,18 @@ export class StorageFileApi {
       | URLSearchParams
       | string,
     fileOptions?: FileOptions
-  ): Promise<{ data: { Key: string } | null; error: Error | null }> {
+  ): Promise<
+    | {
+        data: {
+          Key: string
+        }
+        error: null
+      }
+    | {
+        data: null
+        error: StorageError
+      }
+  > {
     return this.uploadOrUpdate('PUT', path, fileBody, fileOptions)
   }
 
@@ -169,7 +207,16 @@ export class StorageFileApi {
   async move(
     fromPath: string,
     toPath: string
-  ): Promise<{ data: { message: string } | null; error: Error | null }> {
+  ): Promise<
+    | {
+        data: { message: string }
+        error: null
+      }
+    | {
+        data: null
+        error: StorageError
+      }
+  > {
     try {
       const data = await post(
         this.fetch,
@@ -179,7 +226,11 @@ export class StorageFileApi {
       )
       return { data, error: null }
     } catch (error) {
-      return { data: null, error }
+      if (isStorageError(error)) {
+        return { data: null, error }
+      }
+
+      throw error
     }
   }
 
@@ -192,7 +243,16 @@ export class StorageFileApi {
   async copy(
     fromPath: string,
     toPath: string
-  ): Promise<{ data: { message: string } | null; error: Error | null }> {
+  ): Promise<
+    | {
+        data: { message: string }
+        error: null
+      }
+    | {
+        data: null
+        error: StorageError
+      }
+  > {
     try {
       const data = await post(
         this.fetch,
@@ -202,7 +262,11 @@ export class StorageFileApi {
       )
       return { data, error: null }
     } catch (error) {
-      return { data: null, error }
+      if (isStorageError(error)) {
+        return { data: null, error }
+      }
+
+      throw error
     }
   }
 
@@ -215,11 +279,18 @@ export class StorageFileApi {
   async createSignedUrl(
     path: string,
     expiresIn: number
-  ): Promise<{
-    data: { signedURL: string } | null
-    error: Error | null
-    signedURL: string | null
-  }> {
+  ): Promise<
+    | {
+        data: { signedURL: string }
+        error: null
+        signedURL: string
+      }
+    | {
+        data: null
+        error: StorageError
+        signedURL: null
+      }
+  > {
     try {
       const _path = this._getFinalPath(path)
       let data = await post(
@@ -232,7 +303,11 @@ export class StorageFileApi {
       data = { signedURL }
       return { data, error: null, signedURL }
     } catch (error) {
-      return { data: null, error, signedURL: null }
+      if (isStorageError(error)) {
+        return { data: null, error, signedURL: null }
+      }
+
+      throw error
     }
   }
 
@@ -245,10 +320,16 @@ export class StorageFileApi {
   async createSignedUrls(
     paths: string[],
     expiresIn: number
-  ): Promise<{
-    data: { error: string | null; path: string | null; signedURL: string }[] | null
-    error: Error | null
-  }> {
+  ): Promise<
+    | {
+        data: { error: string | null; path: string | null; signedURL: string }[]
+        error: null
+      }
+    | {
+        data: null
+        error: StorageError
+      }
+  > {
     try {
       const data = await post(
         this.fetch,
@@ -264,7 +345,11 @@ export class StorageFileApi {
         error: null,
       }
     } catch (error) {
-      return { data: null, error }
+      if (isStorageError(error)) {
+        return { data: null, error }
+      }
+
+      throw error
     }
   }
 
@@ -273,7 +358,18 @@ export class StorageFileApi {
    *
    * @param path The file path to be downloaded, including the path and file name. For example `folder/image.png`.
    */
-  async download(path: string): Promise<{ data: Blob | null; error: Error | null }> {
+  async download(
+    path: string
+  ): Promise<
+    | {
+        data: Blob
+        error: null
+      }
+    | {
+        data: null
+        error: StorageError
+      }
+  > {
     try {
       const _path = this._getFinalPath(path)
       const res = await get(this.fetch, `${this.url}/object/${_path}`, {
@@ -283,7 +379,11 @@ export class StorageFileApi {
       const data = await res.blob()
       return { data, error: null }
     } catch (error) {
-      return { data: null, error }
+      if (isStorageError(error)) {
+        return { data: null, error }
+      }
+
+      throw error
     }
   }
 
@@ -294,18 +394,30 @@ export class StorageFileApi {
    */
   getPublicUrl(
     path: string
-  ): {
-    data: { publicURL: string } | null
-    error: Error | null
-    publicURL: string | null
-  } {
+  ):
+    | {
+        data: {
+          publicURL: string
+        }
+        error: null
+        publicURL: string
+      }
+    | {
+        data: null
+        error: StorageError
+        publicURL: null
+      } {
     try {
       const _path = this._getFinalPath(path)
       const publicURL = `${this.url}/object/public/${_path}`
       const data = { publicURL }
       return { data, error: null, publicURL }
     } catch (error) {
-      return { data: null, error, publicURL: null }
+      if (isStorageError(error)) {
+        return { data: null, error, publicURL: null }
+      }
+
+      throw error
     }
   }
 
@@ -314,7 +426,18 @@ export class StorageFileApi {
    *
    * @param paths An array of files to be deleted, including the path and file name. For example [`folder/image.png`].
    */
-  async remove(paths: string[]): Promise<{ data: FileObject[] | null; error: Error | null }> {
+  async remove(
+    paths: string[]
+  ): Promise<
+    | {
+        data: FileObject[]
+        error: null
+      }
+    | {
+        data: null
+        error: StorageError
+      }
+  > {
     try {
       const data = await remove(
         this.fetch,
@@ -324,7 +447,11 @@ export class StorageFileApi {
       )
       return { data, error: null }
     } catch (error) {
-      return { data: null, error }
+      if (isStorageError(error)) {
+        return { data: null, error }
+      }
+
+      throw error
     }
   }
 
@@ -332,12 +459,27 @@ export class StorageFileApi {
    * Get file metadata
    * @param id the file id to retrieve metadata
    */
-  // async getMetadata(id: string): Promise<{ data: Metadata | null; error: Error | null }> {
+  // async getMetadata(
+  //   id: string
+  // ): Promise<
+  //   | {
+  //       data: Metadata
+  //       error: null
+  //     }
+  //   | {
+  //       data: null
+  //       error: StorageError
+  //     }
+  // > {
   //   try {
-  //     const data = await get(`${this.url}/metadata/${id}`, { headers: this.headers })
+  //     const data = await get(this.fetch, `${this.url}/metadata/${id}`, { headers: this.headers })
   //     return { data, error: null }
   //   } catch (error) {
-  //     return { data: null, error }
+  //     if (isStorageError(error)) {
+  //       return { data: null, error }
+  //     }
+
+  //     throw error
   //   }
   // }
 
@@ -349,12 +491,30 @@ export class StorageFileApi {
   // async updateMetadata(
   //   id: string,
   //   meta: Metadata
-  // ): Promise<{ data: Metadata | null; error: Error | null }> {
+  // ): Promise<
+  //   | {
+  //       data: Metadata
+  //       error: null
+  //     }
+  //   | {
+  //       data: null
+  //       error: StorageError
+  //     }
+  // > {
   //   try {
-  //     const data = await post(`${this.url}/metadata/${id}`, { ...meta }, { headers: this.headers })
+  //     const data = await post(
+  //       this.fetch,
+  //       `${this.url}/metadata/${id}`,
+  //       { ...meta },
+  //       { headers: this.headers }
+  //     )
   //     return { data, error: null }
   //   } catch (error) {
-  //     return { data: null, error }
+  //     if (isStorageError(error)) {
+  //       return { data: null, error }
+  //     }
+
+  //     throw error
   //   }
   // }
 
@@ -368,7 +528,16 @@ export class StorageFileApi {
     path?: string,
     options?: SearchOptions,
     parameters?: FetchParameters
-  ): Promise<{ data: FileObject[] | null; error: Error | null }> {
+  ): Promise<
+    | {
+        data: FileObject[]
+        error: null
+      }
+    | {
+        data: null
+        error: StorageError
+      }
+  > {
     try {
       const body = { ...DEFAULT_SEARCH_OPTIONS, ...options, prefix: path || '' }
       const data = await post(
@@ -380,7 +549,11 @@ export class StorageFileApi {
       )
       return { data, error: null }
     } catch (error) {
-      return { data: null, error }
+      if (isStorageError(error)) {
+        return { data: null, error }
+      }
+
+      throw error
     }
   }
 
