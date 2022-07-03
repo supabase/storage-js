@@ -62,10 +62,16 @@ export class StorageFileApi {
       | URLSearchParams
       | string,
     fileOptions?: FileOptions
-  ): Promise<{
-    data: { Key: string; path: string; bucketId?: string } | null
-    error: Error | null
-  }> {
+  ): Promise<
+    | {
+        data: { Key: string; path: string; bucketId?: string }
+        error: null
+      }
+    | {
+        data: null
+        error: StorageError
+      }
+  > {
     try {
       let body
       const options = { ...DEFAULT_FILE_OPTIONS, ...fileOptions }
@@ -139,10 +145,16 @@ export class StorageFileApi {
       | URLSearchParams
       | string,
     fileOptions?: FileOptions
-  ): Promise<{
-    data: { Key: string; path: string; bucketId?: string } | null
-    error: Error | null
-  }> {
+  ): Promise<
+    | {
+        data: { Key: string; path: string; bucketId?: string }
+        error: null
+      }
+    | {
+        data: null
+        error: StorageError
+      }
+  > {
     return this.uploadOrUpdate('POST', path, fileBody, fileOptions)
   }
 
@@ -170,10 +182,16 @@ export class StorageFileApi {
       | URLSearchParams
       | string,
     fileOptions?: FileOptions
-  ): Promise<{
-    data: { Key: string; path: string; bucketId?: string } | null
-    error: Error | null
-  }> {
+  ): Promise<
+    | {
+        data: { Key: string; path: string; bucketId?: string }
+        error: null
+      }
+    | {
+        data: null
+        error: StorageError
+      }
+  > {
     return this.uploadOrUpdate('PUT', path, fileBody, fileOptions)
   }
 
