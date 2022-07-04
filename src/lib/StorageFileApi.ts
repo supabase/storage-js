@@ -398,15 +398,6 @@ export class StorageFileApi {
   }
 
   /**
-   * Retrieve URLs for assets in public buckets and returns ONLY the url as a string
-   *
-   * @param path The file path to be downloaded, including the path and file name. For example `folder/image.png`.
-   */
-  getPublicUrlAsString(path: string): string {
-    return this.getPublicUrl(path).data.publicURL
-  }
-
-  /**
    * Deletes files within the same bucket
    *
    * @param paths An array of files to be deleted, including the path and file name. For example [`folder/image.png`].
