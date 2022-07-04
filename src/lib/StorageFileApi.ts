@@ -64,9 +64,7 @@ export class StorageFileApi {
     fileOptions?: FileOptions
   ): Promise<
     | {
-        data: {
-          Key: string
-        }
+        data: { Key: string; path: string; bucketId?: string }
         error: null
       }
     | {
@@ -106,7 +104,10 @@ export class StorageFileApi {
       if (res.ok) {
         // const data = await res.json()
         // temporary fix till backend is updated to the latest storage-api version
-        return { data: { Key: _path }, error: null }
+        return {
+          data: { Key: _path, path: cleanPath, bucketId: this.bucketId },
+          error: null,
+        }
       } else {
         const error = await res.json()
         return { data: null, error }
@@ -146,9 +147,7 @@ export class StorageFileApi {
     fileOptions?: FileOptions
   ): Promise<
     | {
-        data: {
-          Key: string
-        }
+        data: { Key: string; path: string; bucketId?: string }
         error: null
       }
     | {
@@ -185,9 +184,7 @@ export class StorageFileApi {
     fileOptions?: FileOptions
   ): Promise<
     | {
-        data: {
-          Key: string
-        }
+        data: { Key: string; path: string; bucketId?: string }
         error: null
       }
     | {
