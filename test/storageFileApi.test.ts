@@ -8,9 +8,7 @@ const KEY =
 const storage = new StorageClient(URL, { Authorization: `Bearer ${KEY}` })
 const newBucketName = 'my-new-public-bucket'
 
-test('get public URL', async () => {
+test('get public URL', () => {
   const res = storage.from(newBucketName).getPublicUrl('profiles/myUniqueUserId/profile.png')
-  expect(res.error).toBeNull()
-  expect(res.data).toMatchSnapshot()
-  expect(res.publicURL).toMatchSnapshot()
+  expect(res).toMatchSnapshot()
 })

@@ -385,37 +385,13 @@ export class StorageFileApi {
   }
 
   /**
-   * Retrieve URLs for assets in public buckets
+   * Retrieve URLs for assets in public buckets and encapsulates it in a return object
    *
    * @param path The file path to be downloaded, including the path and file name. For example `folder/image.png`.
    */
-  getPublicUrl(
-    path: string
-  ):
-    | {
-        data: {
-          publicURL: string
-        }
-        error: null
-        publicURL: string
-      }
-    | {
-        data: null
-        error: StorageError
-        publicURL: null
-      } {
-    try {
-      const _path = this._getFinalPath(path)
-      const publicURL = `${this.url}/object/public/${_path}`
-      const data = { publicURL }
-      return { data, error: null, publicURL }
-    } catch (error) {
-      if (isStorageError(error)) {
-        return { data: null, error, publicURL: null }
-      }
-
-      throw error
-    }
+  getPublicUrl(path: string): string {
+    const _path = this._getFinalPath(path)
+    return `${this.url}/object/public/${_path}`
   }
 
   /**
