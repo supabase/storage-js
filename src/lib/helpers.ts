@@ -1,5 +1,3 @@
-import crossFetch, { Response as CrossFetchResponse } from 'cross-fetch'
-
 type Fetch = typeof fetch
 
 export const resolveFetch = (customFetch?: Fetch): Fetch => {
@@ -14,9 +12,9 @@ export const resolveFetch = (customFetch?: Fetch): Fetch => {
   return (...args) => _fetch(...args)
 }
 
-export const resolveResponse = () => {
+export const resolveResponse = async () => {
   if (typeof Response === 'undefined') {
-    return CrossFetchResponse
+    return (await import('cross-fetch')).Response
   }
 
   return Response
