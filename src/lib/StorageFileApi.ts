@@ -294,7 +294,7 @@ export class StorageFileApi {
         { expiresIn },
         { headers: this.headers }
       )
-      const signedURL = `${this.url}${data.signedURL}`
+      const signedURL = encodeURI(`${this.url}${data.signedURL}`)
       data = { signedURL }
       return { data, error: null, signedURL }
     } catch (error) {
@@ -335,7 +335,7 @@ export class StorageFileApi {
       return {
         data: data.map((datum: { signedURL: string }) => ({
           ...datum,
-          signedURL: datum.signedURL ? `${this.url}${datum.signedURL}` : null,
+          signedURL: datum.signedURL ? encodeURI(`${this.url}${datum.signedURL}`) : null,
         })),
         error: null,
       }
@@ -389,7 +389,7 @@ export class StorageFileApi {
    */
   getPublicUrl(path: string): string {
     const _path = this._getFinalPath(path)
-    return `${this.url}/object/public/${_path}`
+    return encodeURI(`${this.url}/object/public/${_path}`)
   }
 
   /**
