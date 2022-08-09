@@ -44,7 +44,9 @@ export interface SearchOptions {
   search?: string
 }
 
-// TODO: need to check for metadata props. The api swagger doesnt have.
 export interface Metadata {
   name: string
+  size?: number
+  mimetype?: string
+  cacheControl?: string
 }
