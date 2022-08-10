@@ -278,12 +278,10 @@ export class StorageFileApi {
     | {
         data: { signedURL: string }
         error: null
-        signedURL: string
       }
     | {
         data: null
         error: StorageError
-        signedURL: null
       }
   > {
     try {
@@ -296,10 +294,10 @@ export class StorageFileApi {
       )
       const signedURL = encodeURI(`${this.url}${data.signedURL}`)
       data = { signedURL }
-      return { data, error: null, signedURL }
+      return { data, error: null }
     } catch (error) {
       if (isStorageError(error)) {
-        return { data: null, error, signedURL: null }
+        return { data: null, error }
       }
 
       throw error
