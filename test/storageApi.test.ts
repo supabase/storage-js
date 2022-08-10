@@ -31,7 +31,7 @@ test('Get bucket with wrong id', async () => {
 
 test('create new bucket', async () => {
   const res = await storage.createBucket(newBucketName)
-  expect(res.data).toEqual(newBucketName)
+  expect(res.data?.name).toEqual(newBucketName)
 })
 
 test('create new public bucket', async () => {
