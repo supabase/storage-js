@@ -15,7 +15,7 @@ export interface FileObject {
   updated_at: string
   created_at: string
   last_accessed_at: string
-  metadata: {}
+  metadata: Record<string, any>
   buckets: Bucket
 }
 
