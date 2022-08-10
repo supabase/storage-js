@@ -80,7 +80,7 @@ export class StorageBucketApi {
     options: { public: boolean } = { public: false }
   ): Promise<
     | {
-        data: string
+        data: Pick<Bucket, 'name'>
         error: null
       }
     | {
@@ -95,7 +95,7 @@ export class StorageBucketApi {
         { id, name: id, public: options.public },
         { headers: this.headers }
       )
-      return { data: data.name, error: null }
+      return { data, error: null }
     } catch (error) {
       if (isStorageError(error)) {
         return { data: null, error }
