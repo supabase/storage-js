@@ -1,10 +1,10 @@
-import { DEFAULT_HEADERS } from './constants'
-import { isStorageError, StorageError } from './errors'
-import { Fetch, get, post, put, remove } from './fetch'
-import { resolveFetch } from './helpers'
-import { Bucket } from './types'
+import { DEFAULT_HEADERS } from '../lib/constants'
+import { isStorageError, StorageError } from '../lib/errors'
+import { Fetch, get, post, put, remove } from '../lib/fetch'
+import { resolveFetch } from '../lib/helpers'
+import { Bucket } from '../lib/types'
 
-export class StorageBucketApi {
+export default class StorageBucketApi {
   protected url: string
   protected headers: { [key: string]: string }
   protected fetch: Fetch
