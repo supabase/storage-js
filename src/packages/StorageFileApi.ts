@@ -1,7 +1,7 @@
-import { isStorageError, StorageError } from './errors'
-import { Fetch, FetchParameters, get, post, remove } from './fetch'
-import { resolveFetch } from './helpers'
-import { FileObject, FileOptions, SearchOptions } from './types'
+import { isStorageError, StorageError } from '../lib/errors'
+import { Fetch, FetchParameters, get, post, remove } from '../lib/fetch'
+import { resolveFetch } from '../lib/helpers'
+import { FileObject, FileOptions, SearchOptions } from '../lib/types'
 
 const DEFAULT_SEARCH_OPTIONS = {
   limit: 100,
@@ -18,7 +18,7 @@ const DEFAULT_FILE_OPTIONS: FileOptions = {
   upsert: false,
 }
 
-export class StorageFileApi {
+export default class StorageFileApi {
   protected url: string
   protected headers: { [key: string]: string }
   protected bucketId?: string
@@ -526,11 +526,11 @@ export class StorageFileApi {
     }
   }
 
-  _getFinalPath(path: string) {
+  private _getFinalPath(path: string) {
     return `${this.bucketId}/${path}`
   }
 
-  _removeEmptyFolders(path: string) {
+  private _removeEmptyFolders(path: string) {
     return path.replace(/^\/|\/$/g, '').replace(/\/+/g, '/')
   }
 }

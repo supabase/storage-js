@@ -1,4 +1,4 @@
-import { StorageBucketApi } from '../src/lib'
+import StorageBucketApi from '../src/packages/StorageBucketApi'
 
 // TODO: need to setup storage-api server for this test
 const URL = 'http://localhost:8000/storage/v1'
