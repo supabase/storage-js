@@ -276,7 +276,7 @@ export default class StorageFileApi {
     expiresIn: number
   ): Promise<
     | {
-        data: { signedURL: string }
+        data: { signedUrl: string }
         error: null
       }
     | {
@@ -292,8 +292,8 @@ export default class StorageFileApi {
         { expiresIn },
         { headers: this.headers }
       )
-      const signedURL = encodeURI(`${this.url}${data.signedURL}`)
-      data = { signedURL }
+      const signedUrl = encodeURI(`${this.url}${data.signedURL}`)
+      data = { signedUrl }
       return { data, error: null }
     } catch (error) {
       if (isStorageError(error)) {
@@ -315,7 +315,7 @@ export default class StorageFileApi {
     expiresIn: number
   ): Promise<
     | {
-        data: { error: string | null; path: string | null; signedURL: string }[]
+        data: { error: string | null; path: string | null; signedUrl: string }[]
         error: null
       }
     | {
@@ -333,7 +333,7 @@ export default class StorageFileApi {
       return {
         data: data.map((datum: { signedURL: string }) => ({
           ...datum,
-          signedURL: datum.signedURL ? encodeURI(`${this.url}${datum.signedURL}`) : null,
+          signedUrl: datum.signedURL ? encodeURI(`${this.url}${datum.signedURL}`) : null,
         })),
         error: null,
       }
