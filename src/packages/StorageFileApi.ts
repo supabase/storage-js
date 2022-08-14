@@ -385,9 +385,9 @@ export default class StorageFileApi {
    *
    * @param path The file path to be downloaded, including the path and file name. For example `folder/image.png`.
    */
-  getPublicUrl(path: string): { data: { publicUrl: string }; error: null } {
+  getPublicUrl(path: string): { data: { publicUrl: string } } {
     const _path = this._getFinalPath(path)
-    return { data: { publicUrl: encodeURI(`${this.url}/object/public/${_path}`) }, error: null }
+    return { data: { publicUrl: encodeURI(`${this.url}/object/public/${_path}`) } }
   }
 
   /**
