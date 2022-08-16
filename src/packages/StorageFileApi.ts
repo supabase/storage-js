@@ -1,7 +1,7 @@
 import { isStorageError, StorageError } from '../lib/errors'
-import { Fetch, FetchParameters, get, post, remove } from '../lib/fetch'
+import { Fetch, get, post, remove } from '../lib/fetch'
 import { resolveFetch } from '../lib/helpers'
-import { FileObject, FileOptions, SearchOptions } from '../lib/types'
+import { FileObject, FileOptions, SearchOptions, FetchParameters } from '../lib/types'
 
 const DEFAULT_SEARCH_OPTIONS = {
   limit: 100,
@@ -42,10 +42,6 @@ export default class StorageFileApi {
    * @param method HTTP method.
    * @param path The relative file path. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
    * @param fileBody The body of the file to be stored in the bucket.
-   * @param fileOptions HTTP headers.
-   * `cacheControl`: string, the `Cache-Control: max-age=<seconds>` seconds value.
-   * `contentType`: string, the `Content-Type` header value. Should be specified if using a `fileBody` that is neither `Blob` nor `File` nor `FormData`, otherwise will default to `text/plain;charset=UTF-8`.
-   * `upsert`: boolean, whether to perform an upsert.
    */
   private async uploadOrUpdate(
     method: 'POST' | 'PUT',
@@ -124,10 +120,6 @@ export default class StorageFileApi {
    *
    * @param path The relative file path. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
    * @param fileBody The body of the file to be stored in the bucket.
-   * @param fileOptions HTTP headers.
-   * `cacheControl`: string, the `Cache-Control: max-age=<seconds>` seconds value.
-   * `contentType`: string, the `Content-Type` header value. Should be specified if using a `fileBody` that is neither `Blob` nor `File` nor `FormData`, otherwise will default to `text/plain;charset=UTF-8`.
-   * `upsert`: boolean, whether to perform an upsert.
    */
   async upload(
     path: string,
@@ -161,10 +153,6 @@ export default class StorageFileApi {
    *
    * @param path The relative file path. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
    * @param fileBody The body of the file to be stored in the bucket.
-   * @param fileOptions HTTP headers.
-   * `cacheControl`: string, the `Cache-Control: max-age=<seconds>` seconds value.
-   * `contentType`: string, the `Content-Type` header value. Should be specified if using a `fileBody` that is neither `Blob` nor `File` nor `FormData`, otherwise will default to `text/plain;charset=UTF-8`.
-   * `upsert`: boolean, whether to perform an upsert.
    */
   async update(
     path: string,
@@ -490,8 +478,6 @@ export default class StorageFileApi {
   /**
    * Lists all the files within a bucket.
    * @param path The folder path.
-   * @param options Search options, including `limit`, `offset`, `sortBy`, and `search`.
-   * @param parameters Fetch parameters, currently only supports `signal`, which is an AbortController's signal
    */
   async list(
     path?: string,
