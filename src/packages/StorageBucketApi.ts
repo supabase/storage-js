@@ -73,6 +73,7 @@ export default class StorageBucketApi {
    * Creates a new Storage bucket
    *
    * @param id A unique identifier for the bucket you are creating.
+   * @param options.public The visibility of the bucket. By default, buckets are not public.
    * @returns newly created bucket id
    */
   async createBucket(
@@ -109,6 +110,7 @@ export default class StorageBucketApi {
    * Updates a new Storage bucket
    *
    * @param id A unique identifier for the bucket you are updating.
+   * @param options.public The visibility of the bucket.
    */
   async updateBucket(
     id: string,

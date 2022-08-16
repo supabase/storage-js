@@ -1,5 +1,6 @@
 import { StorageApiError, StorageUnknownError } from './errors'
 import { resolveResponse } from './helpers'
+import { FetchParameters } from './types'
 
 export type Fetch = typeof fetch
 
@@ -8,10 +9,6 @@ export interface FetchOptions {
     [key: string]: string
   }
   noResolveJson?: boolean
-}
-
-export interface FetchParameters {
-  signal?: AbortSignal
 }
 
 export type RequestMethodType = 'GET' | 'POST' | 'PUT' | 'DELETE'

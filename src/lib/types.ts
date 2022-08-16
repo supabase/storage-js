@@ -25,23 +25,47 @@ export interface SortBy {
 }
 
 export interface FileOptions {
+  /**
+   * the `Cache-Control: max-age=<seconds>` seconds value.
+   */
   cacheControl?: string
+  /**
+   * the `Content-Type` header value. Should be specified if using a `fileBody` that is neither `Blob` nor `File` nor `FormData`, otherwise will default to `text/plain;charset=UTF-8`.
+   */
   contentType?: string
+  /**
+   * whether to perform an upsert
+   */
   upsert?: boolean
 }
 
 export interface SearchOptions {
-  /** The number of files you want to be returned. */
+  /**
+   *  The number of files you want to be returned.
+   */
   limit?: number
 
-  /** The starting position. */
+  /**
+   * The starting position.
+   */
   offset?: number
 
-  /** The column to sort by. Can be any column inside a FileObject. */
+  /**
+   * The column to sort by. Can be any column inside a FileObject.
+   */
   sortBy?: SortBy
 
-  /** The search string to filter files by. */
+  /**
+   * The search string to filter files by.
+   */
   search?: string
+}
+
+export interface FetchParameters {
+  /**
+   * Pass in an AbortController's signal to cancel the request.
+   */
+  signal?: AbortSignal
 }
 
 // TODO: need to check for metadata props. The api swagger doesnt have.
