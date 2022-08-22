@@ -151,7 +151,7 @@ export default class StorageFileApi {
   /**
    * Replaces an existing file at the specified path with a new one.
    *
-   * @param path The relative file path. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
+   * @param path The relative file path. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to update.
    * @param fileBody The body of the file to be stored in the bucket.
    */
   async update(
@@ -182,7 +182,7 @@ export default class StorageFileApi {
   }
 
   /**
-   * Moves an existing file.
+   * Moves an existing file to a new path in the same bucket.
    *
    * @param fromPath The original file path, including the current file name. For example `folder/image.png`.
    * @param toPath The new file path, including the new file name. For example `folder/image-new.png`.
@@ -218,7 +218,7 @@ export default class StorageFileApi {
   }
 
   /**
-   * Copies an existing file.
+   * Copies an existing file to a new path in the same bucket.
    *
    * @param fromPath The original file path, including the current file name. For example `folder/image.png`.
    * @param toPath The new file path, including the new file name. For example `folder/image-copy.png`.
@@ -254,9 +254,9 @@ export default class StorageFileApi {
   }
 
   /**
-   * Create signed URL to download file without requiring permissions. This URL can be valid for a set number of seconds.
+   * Create a signed URL. A signed URL can be used to share a file with anyone who has the URL for a fixed amount of time.
    *
-   * @param path The file path to be downloaded, including the current file name. For example `folder/image.png`.
+   * @param path The file path, including the current file name. For example `folder/image.png`.
    * @param expiresIn The number of seconds until the signed URL expires. For example, `60` for a URL which is valid for one minute.
    */
   async createSignedUrl(
@@ -293,7 +293,7 @@ export default class StorageFileApi {
   }
 
   /**
-   * Create signed URLs to download files without requiring permissions. These URLs can be valid for a set number of seconds.
+   * This is the batch endpoint for creating multiple signed URLs. A signed URL can be used to share a file with anyone who has the URL for a fixed amount of time.
    *
    * @param paths The file paths to be downloaded, including the current file names. For example `['folder/image.png', 'folder2/image2.png']`.
    * @param expiresIn The number of seconds until the signed URLs expire. For example, `60` for URLs which are valid for one minute.
@@ -337,7 +337,7 @@ export default class StorageFileApi {
   /**
    * Downloads a file.
    *
-   * @param path The file path to be downloaded, including the path and file name. For example `folder/image.png`.
+   * @param path The file to be downloaded, including the path and file name. For example `folder/image.png`.
    */
   async download(
     path: string
@@ -369,9 +369,10 @@ export default class StorageFileApi {
   }
 
   /**
-   * Retrieve URLs for assets in public buckets and encapsulates it in a return object
+   * Retrieve the URL for an asset in a public buckets.
+   * This is function does not actually verify if the bucket is public. If a public URL is created for a bucket which is not public, you will not be able to download the asset.
    *
-   * @param path The file path to be downloaded, including the path and file name. For example `folder/image.png`.
+   * @param path The path and name of the file to generate the public URL for. For example `folder/image.png`.
    */
   getPublicUrl(path: string): { data: { publicUrl: string } } {
     const _path = this._getFinalPath(path)

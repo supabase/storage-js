@@ -26,7 +26,7 @@ export interface SortBy {
 
 export interface FileOptions {
   /**
-   * the `Cache-Control: max-age=<seconds>` seconds value.
+   * The number of seconds the asset is cached in the browser and in the Supabase CDN. Defaults to 3600 seconds. This is set in the `Cache-Control: max-age=<seconds>` header.
    */
   cacheControl?: string
   /**
@@ -34,7 +34,7 @@ export interface FileOptions {
    */
   contentType?: string
   /**
-   * whether to perform an upsert
+   * When upsert is set to true, the file will be overwritten if it exists. When set to false, an error will be thrown if the object already exists. Defaults to false.
    */
   upsert?: boolean
 }
