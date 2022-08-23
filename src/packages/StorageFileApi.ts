@@ -382,7 +382,7 @@ export default class StorageFileApi {
   /**
    * Deletes files within the same bucket
    *
-   * @param paths An array of files to be delete, including the path and file name. For example [`'folder/image.png'`].
+   * @param paths An array of files to delete, including the path and file name. For example [`'folder/image.png'`].
    */
   async remove(
     paths: string[]
