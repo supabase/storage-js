@@ -118,7 +118,7 @@ export default class StorageFileApi {
   /**
    * Uploads a file to an existing bucket.
    *
-   * @param path The relative file path. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
+   * @param path The file path, including the file name. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
    * @param fileBody The body of the file to be stored in the bucket.
    */
   async upload(
@@ -254,7 +254,7 @@ export default class StorageFileApi {
   }
 
   /**
-   * Create a signed URL. A signed URL can be used to share a file with anyone who has the URL for a fixed amount of time.
+   * Creates a signed URL. Use a signed URL to share a file for a fixed amount of time.
    *
    * @param path The file path, including the current file name. For example `folder/image.png`.
    * @param expiresIn The number of seconds until the signed URL expires. For example, `60` for a URL which is valid for one minute.
@@ -293,7 +293,7 @@ export default class StorageFileApi {
   }
 
   /**
-   * This is the batch endpoint for creating multiple signed URLs. A signed URL can be used to share a file with anyone who has the URL for a fixed amount of time.
+   * Creates multiple signed URLs. Use a signed URL to share a file for a fixed amount of time.
    *
    * @param paths The file paths to be downloaded, including the current file names. For example `['folder/image.png', 'folder2/image2.png']`.
    * @param expiresIn The number of seconds until the signed URLs expire. For example, `60` for URLs which are valid for one minute.
@@ -337,7 +337,7 @@ export default class StorageFileApi {
   /**
    * Downloads a file.
    *
-   * @param path The file to be downloaded, including the path and file name. For example `folder/image.png`.
+   * @param path The full path and file name of the file to be downloaded. For example `folder/image.png`.
    */
   async download(
     path: string
@@ -369,8 +369,8 @@ export default class StorageFileApi {
   }
 
   /**
-   * Retrieve the URL for an asset in a public bucket.
-   * This function does not actually verify if the bucket is public. If a public URL is created for a bucket which is not public, you will not be able to download the asset.
+   * Retrieves the URL for an asset in a public bucket.
+   * This function does not verify if the bucket is public. If a public URL is created for a bucket which is not public, you will not be able to download the asset.
    *
    * @param path The path and name of the file to generate the public URL for. For example `folder/image.png`.
    */
@@ -382,7 +382,7 @@ export default class StorageFileApi {
   /**
    * Deletes files within the same bucket
    *
-   * @param paths An array of files to be deleted, including the path and file name. For example [`folder/image.png`].
+   * @param paths An array of files to be delete, including the path and file name. For example [`'folder/image.png'`].
    */
   async remove(
     paths: string[]
