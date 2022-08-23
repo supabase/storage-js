@@ -73,7 +73,7 @@ export default class StorageBucketApi {
    * Creates a new Storage bucket
    *
    * @param id A unique identifier for the bucket you are creating.
-   * @param options.public The visibility of the bucket. By default, buckets are not public.
+   * @param options.public The visibility of the bucket. Public buckets don't require an authorization token to download objects, but still require a valid token for all other operations. By default, buckets are private.
    * @returns newly created bucket id
    */
   async createBucket(
@@ -107,10 +107,10 @@ export default class StorageBucketApi {
   }
 
   /**
-   * Updates a new Storage bucket
+   * Updates a Storage bucket
    *
    * @param id A unique identifier for the bucket you are updating.
-   * @param options.public The visibility of the bucket.
+   * @param options.public The visibility of the bucket. Public buckets don't require an authorization token to download objects, but still require a valid token for all other operations.
    */
   async updateBucket(
     id: string,
