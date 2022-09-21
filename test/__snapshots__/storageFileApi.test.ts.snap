@@ -1,9 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`get public URL 1`] = `
-Object {
-  "data": Object {
-    "publicUrl": "http://localhost:8000/storage/v1/object/public/my-new-public-bucket/profiles/myUniqueUserId/profile.png",
-  },
-}
-`;
