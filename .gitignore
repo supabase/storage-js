@@ -106,3 +106,6 @@ dist
 
 # generated docs
 docs
+
+# IDE
+.idea/
