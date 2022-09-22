@@ -228,7 +228,7 @@ export default class StorageFileApi {
     toPath: string
   ): Promise<
     | {
-        data: { message: string }
+        data: { path: string }
         error: null
       }
     | {
@@ -243,7 +243,7 @@ export default class StorageFileApi {
         { bucketId: this.bucketId, sourceKey: fromPath, destinationKey: toPath },
         { headers: this.headers }
       )
-      return { data, error: null }
+      return { data: { path: data.Key }, error: null }
     } catch (error) {
       if (isStorageError(error)) {
         return { data: null, error }
