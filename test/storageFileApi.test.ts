@@ -122,10 +122,7 @@ describe('Object API', () => {
       const res = await storage.from(bucketName).copy(uploadPath, newPath)
 
       expect(res.error).toBeNull()
-
-      // TODO: current types are wrong, workaround for now
-      // @ts-ignore
-      expect(res.data?.Key).toEqual(`${bucketName}/${newPath}`)
+      expect(res.data?.path).toEqual(`${bucketName}/${newPath}`)
     })
 
     test('downloads an object', async () => {
