@@ -258,10 +258,12 @@ export default class StorageFileApi {
    *
    * @param path The file path, including the current file name. For example `folder/image.png`.
    * @param expiresIn The number of seconds until the signed URL expires. For example, `60` for a URL which is valid for one minute.
+   * @param options.download triggers the file as a download if set to true. Set this parameter as the name of the file if you want to trigger the download with a different filename.
    */
   async createSignedUrl(
     path: string,
-    expiresIn: number
+    expiresIn: number,
+    options?: { download: string | boolean }
   ): Promise<
     | {
         data: { signedUrl: string }
@@ -280,7 +282,10 @@ export default class StorageFileApi {
         { expiresIn },
         { headers: this.headers }
       )
-      const signedUrl = encodeURI(`${this.url}${data.signedURL}`)
+      const downloadQueryParam = options?.download
+        ? `&download=${options.download === true ? '' : options.download}`
+        : ''
+      const signedUrl = encodeURI(`${this.url}${data.signedURL}${downloadQueryParam}`)
       data = { signedUrl }
       return { data, error: null }
     } catch (error) {
@@ -297,10 +302,12 @@ export default class StorageFileApi {
    *
    * @param paths The file paths to be downloaded, including the current file names. For example `['folder/image.png', 'folder2/image2.png']`.
    * @param expiresIn The number of seconds until the signed URLs expire. For example, `60` for URLs which are valid for one minute.
+   * @param options.download triggers the file as a download if set to true. Set this parameter as the name of the file if you want to trigger the download with a different filename.
    */
   async createSignedUrls(
     paths: string[],
-    expiresIn: number
+    expiresIn: number,
+    options?: { download: string | boolean }
   ): Promise<
     | {
         data: { error: string | null; path: string | null; signedUrl: string }[]
@@ -318,10 +325,16 @@ export default class StorageFileApi {
         { expiresIn, paths },
         { headers: this.headers }
       )
+
+      const downloadQueryParam = options?.download
+        ? `&download=${options.download === true ? '' : options.download}`
+        : ''
       return {
         data: data.map((datum: { signedURL: string }) => ({
           ...datum,
-          signedUrl: datum.signedURL ? encodeURI(`${this.url}${datum.signedURL}`) : null,
+          signedUrl: datum.signedURL
+            ? encodeURI(`${this.url}${datum.signedURL}${downloadQueryParam}`)
+            : null,
         })),
         error: null,
       }
@@ -373,10 +386,20 @@ export default class StorageFileApi {
    * This function does not verify if the bucket is public. If a public URL is created for a bucket which is not public, you will not be able to download the asset.
    *
    * @param path The path and name of the file to generate the public URL for. For example `folder/image.png`.
+   * @param options.download triggers the file as a download if set to true. Set this parameter as the name of the file if you want to trigger the download with a different filename.
    */
-  getPublicUrl(path: string): { data: { publicUrl: string } } {
+  getPublicUrl(
+    path: string,
+    options?: { download: string | boolean }
+  ): { data: { publicUrl: string } } {
     const _path = this._getFinalPath(path)
-    return { data: { publicUrl: encodeURI(`${this.url}/object/public/${_path}`) } }
+    const downloadQueryParam = options?.download
+      ? `?download=${options.download === true ? '' : options.download}`
+      : ''
+
+    return {
+      data: { publicUrl: encodeURI(`${this.url}/object/public/${_path}${downloadQueryParam}`) },
+    }
   }
 
   /**

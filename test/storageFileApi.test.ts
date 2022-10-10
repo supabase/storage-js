@@ -35,12 +35,52 @@ describe('Object API', () => {
       expect(res.data.publicUrl).toEqual(`${URL}/object/public/${bucketName}/${uploadPath}`)
     })
 
+    test('get public URL with download querystring', async () => {
+      const res = storage.from(bucketName).getPublicUrl(uploadPath, {
+        download: true,
+      })
+      expect(res.data.publicUrl).toEqual(
+        `${URL}/object/public/${bucketName}/${uploadPath}?download=`
+      )
+    })
+
+    test('get public URL with custom for download', async () => {
+      const res = storage.from(bucketName).getPublicUrl(uploadPath, {
+        download: 'test.jpg',
+      })
+      expect(res.data.publicUrl).toEqual(
+        `${URL}/object/public/${bucketName}/${uploadPath}?download=test.jpg`
+      )
+    })
+
     test('sign url', async () => {
       await storage.from(bucketName).upload(uploadPath, file)
       const res = await storage.from(bucketName).createSignedUrl(uploadPath, 2000)
 
       expect(res.error).toBeNull()
       expect(res.data?.signedUrl).toContain(`${URL}/object/sign/${bucketName}/${uploadPath}`)
+    })
+
+    test('sign url with download querystring parameter', async () => {
+      await storage.from(bucketName).upload(uploadPath, file)
+      const res = await storage.from(bucketName).createSignedUrl(uploadPath, 2000, {
+        download: true,
+      })
+
+      expect(res.error).toBeNull()
+      expect(res.data?.signedUrl).toContain(`${URL}/object/sign/${bucketName}/${uploadPath}`)
+      expect(res.data?.signedUrl).toContain(`&download=`)
+    })
+
+    test('sign url with custom filename for download', async () => {
+      await storage.from(bucketName).upload(uploadPath, file)
+      const res = await storage.from(bucketName).createSignedUrl(uploadPath, 2000, {
+        download: 'test.jpg',
+      })
+
+      expect(res.error).toBeNull()
+      expect(res.data?.signedUrl).toContain(`${URL}/object/sign/${bucketName}/${uploadPath}`)
+      expect(res.data?.signedUrl).toContain(`&download=test.jpg`)
     })
   })
 
