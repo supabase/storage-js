@@ -105,7 +105,7 @@ dist
 .tern-port
 
 # generated docs
-docs
+docs/v2
 
 # IDE
 .idea/
