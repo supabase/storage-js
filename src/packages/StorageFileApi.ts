@@ -1,7 +1,13 @@
 import { isStorageError, StorageError } from '../lib/errors'
 import { Fetch, get, post, remove } from '../lib/fetch'
 import { resolveFetch } from '../lib/helpers'
-import { FileObject, FileOptions, SearchOptions, FetchParameters } from '../lib/types'
+import {
+  FileObject,
+  FileOptions,
+  SearchOptions,
+  FetchParameters,
+  TransformOptions,
+} from '../lib/types'
 
 const DEFAULT_SEARCH_OPTIONS = {
   limit: 100,
@@ -263,7 +269,7 @@ export default class StorageFileApi {
   async createSignedUrl(
     path: string,
     expiresIn: number,
-    options?: { download: string | boolean }
+    options?: { download?: string | boolean; transform?: TransformOptions }
   ): Promise<
     | {
         data: { signedUrl: string }
@@ -275,11 +281,12 @@ export default class StorageFileApi {
       }
   > {
     try {
-      const _path = this._getFinalPath(path)
+      let _path = this._getFinalPath(path)
+
       let data = await post(
         this.fetch,
         `${this.url}/object/sign/${_path}`,
-        { expiresIn },
+        { expiresIn, ...(options?.transform ? { transform: options.transform } : {}) },
         { headers: this.headers }
       )
       const downloadQueryParam = options?.download
@@ -348,12 +355,59 @@ export default class StorageFileApi {
   }
 
   /**
+   * Download a file in a public bucket
+   * @param path
+   * @param options
+   */
+  publicDownload(
+    path: string,
+    options?: {
+      transform?: TransformOptions
+    }
+  ) {
+    const wantsTransformations = typeof options?.transform !== 'undefined'
+    const renderPath = wantsTransformations ? 'render/image' : 'object'
+    const queryString = this.transformOptsToQueryString(options?.transform || {})
+
+    return this.download(path, {
+      prefix: `${renderPath}/public`,
+      queryString: queryString,
+    })
+  }
+
+  /**
+   * Download a file in a private bucket
+   * @param path
+   * @param options
+   */
+  authenticatedDownload(
+    path: string,
+    options?: {
+      transform?: TransformOptions
+    }
+  ) {
+    const wantsTransformations = typeof options?.transform !== 'undefined'
+    const renderPath = wantsTransformations ? 'render/image' : 'object'
+    const queryString = this.transformOptsToQueryString(options?.transform || {})
+
+    return this.download(path, {
+      prefix: `${renderPath}/authenticated`,
+      queryString: queryString,
+    })
+  }
+
+  /**
    * Downloads a file.
    *
    * @param path The full path and file name of the file to be downloaded. For example `folder/image.png`.
+   * @deprecated use publicDownload or authenticatedDownload
    */
   async download(
-    path: string
+    path: string,
+    options?: {
+      prefix?: string
+      queryString?: string
+    }
   ): Promise<
     | {
         data: Blob
@@ -366,10 +420,17 @@ export default class StorageFileApi {
   > {
     try {
       const _path = this._getFinalPath(path)
-      const res = await get(this.fetch, `${this.url}/object/${_path}`, {
-        headers: this.headers,
-        noResolveJson: true,
-      })
+      const renderPath = options?.prefix ?? 'object'
+      const queryString = options?.queryString
+
+      const res = await get(
+        this.fetch,
+        `${this.url}/${renderPath}/${_path}${queryString ? `?${queryString}` : ''}`,
+        {
+          headers: this.headers,
+          noResolveJson: true,
+        }
+      )
       const data = await res.blob()
       return { data, error: null }
     } catch (error) {
@@ -387,18 +448,38 @@ export default class StorageFileApi {
    *
    * @param path The path and name of the file to generate the public URL for. For example `folder/image.png`.
    * @param options.download triggers the file as a download if set to true. Set this parameter as the name of the file if you want to trigger the download with a different filename.
+   * @param options.transform adds image transformations parameters to the generated url
    */
   getPublicUrl(
     path: string,
-    options?: { download: string | boolean }
+    options?: { download?: string | boolean; transform?: TransformOptions }
   ): { data: { publicUrl: string } } {
     const _path = this._getFinalPath(path)
+    const _queryString = []
+
     const downloadQueryParam = options?.download
-      ? `?download=${options.download === true ? '' : options.download}`
+      ? `download=${options.download === true ? '' : options.download}`
       : ''
 
+    if (downloadQueryParam !== '') {
+      _queryString.push(downloadQueryParam)
+    }
+
+    const wantsTransformation = typeof options?.transform !== 'undefined'
+    const renderPath = wantsTransformation ? 'render/image' : 'object'
+    const transformationQuery = this.transformOptsToQueryString(options?.transform || {})
+
+    if (transformationQuery !== '') {
+      _queryString.push(transformationQuery)
+    }
+
+    let queryString = _queryString.join('&')
+    if (queryString !== '') {
+      queryString = `?${queryString}`
+    }
+
     return {
-      data: { publicUrl: encodeURI(`${this.url}/object/public/${_path}${downloadQueryParam}`) },
+      data: { publicUrl: encodeURI(`${this.url}/${renderPath}/public/${_path}${queryString}`) },
     }
   }
 
@@ -542,5 +623,22 @@ export default class StorageFileApi {
 
   private _removeEmptyFolders(path: string) {
     return path.replace(/^\/|\/$/g, '').replace(/\/+/g, '/')
+  }
+
+  private transformOptsToQueryString(transform: TransformOptions) {
+    const params = []
+    if (transform.width) {
+      params.push(`width=${transform.width}`)
+    }
+
+    if (transform.height) {
+      params.push(`height=${transform.height}`)
+    }
+
+    if (transform.resize) {
+      params.push(`resize=${transform.resize}`)
+    }
+
+    return params.join('&')
   }
 }
