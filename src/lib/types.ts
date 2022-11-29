@@ -72,3 +72,9 @@ export interface FetchParameters {
 export interface Metadata {
   name: string
 }
+
+export interface TransformOptions {
+  width?: number
+  height?: number
+  resize?: 'fill' | 'fit' | 'fill-down' | 'force' | 'auto'
+}
