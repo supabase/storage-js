@@ -265,6 +265,7 @@ export default class StorageFileApi {
    * @param path The file path, including the current file name. For example `folder/image.png`.
    * @param expiresIn The number of seconds until the signed URL expires. For example, `60` for a URL which is valid for one minute.
    * @param options.download triggers the file as a download if set to true. Set this parameter as the name of the file if you want to trigger the download with a different filename.
+   * @param options.transform The visiting client will receive the transformed variant of the image by providing transform options
    */
   async createSignedUrl(
     path: string,
@@ -356,8 +357,9 @@ export default class StorageFileApi {
 
   /**
    * Download a file in a public bucket
-   * @param path
-   * @param options
+   *
+   * @param path The file path, including the current file name. For example `folder/image.png`.
+   * @param options.transform download a transformed variant of the image with the provided filters
    */
   publicDownload(
     path: string,
@@ -377,8 +379,8 @@ export default class StorageFileApi {
 
   /**
    * Download a file in a private bucket
-   * @param path
-   * @param options
+   * @param path The full path and file name of the file to be downloaded. For example `folder/image.png`.
+   * @param options.transform download a transformed variant of the image with the provided filters
    */
   authenticatedDownload(
     path: string,
