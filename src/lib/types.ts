@@ -76,5 +76,5 @@ export interface Metadata {
 export interface TransformOptions {
   width?: number
   height?: number
-  resize?: 'fill' | 'fit' | 'fill-down' | 'force' | 'auto'
+  resize?: 'cover' | 'contain' | 'fill'
 }
