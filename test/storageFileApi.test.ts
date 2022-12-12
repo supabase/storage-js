@@ -228,20 +228,6 @@ describe('Object API', () => {
       )
     })
 
-    it('will download a public transformed file', async () => {
-      await storage.from(bucketName).upload(uploadPath, file)
-      const res = await storage.from(bucketName).publicDownload(uploadPath, {
-        transform: {
-          width: 200,
-          height: 200,
-        },
-      })
-
-      expect(res.error).toBeNull()
-      expect(res.data?.size).toBeGreaterThan(0)
-      expect(res.data?.type).toEqual('image/jpeg')
-    })
-
     it('will download an authenticated transformed file', async () => {
       const privateBucketName = 'my-private-bucket'
       await findOrCreateBucket(privateBucketName)
@@ -249,7 +235,7 @@ describe('Object API', () => {
       const { error: uploadError } = await storage.from(privateBucketName).upload(uploadPath, file)
       expect(uploadError).toBeNull()
 
-      const res = await storage.from(privateBucketName).authenticatedDownload(uploadPath, {
+      const res = await storage.from(privateBucketName).download(uploadPath, {
         transform: {
           width: 200,
           height: 200,
