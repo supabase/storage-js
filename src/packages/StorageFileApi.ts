@@ -356,60 +356,14 @@ export default class StorageFileApi {
   }
 
   /**
-   * Download a file in a public bucket
-   *
-   * @param path The file path, including the current file name. For example `folder/image.png`.
-   * @param options.transform download a transformed variant of the image with the provided filters
-   */
-  publicDownload(
-    path: string,
-    options?: {
-      transform?: TransformOptions
-    }
-  ) {
-    const wantsTransformations = typeof options?.transform !== 'undefined'
-    const renderPath = wantsTransformations ? 'render/image' : 'object'
-    const queryString = this.transformOptsToQueryString(options?.transform || {})
-
-    return this.download(path, {
-      prefix: `${renderPath}/public`,
-      queryString: queryString,
-    })
-  }
-
-  /**
-   * Download a file in a private bucket
-   * @param path The full path and file name of the file to be downloaded. For example `folder/image.png`.
-   * @param options.transform download a transformed variant of the image with the provided filters
-   */
-  authenticatedDownload(
-    path: string,
-    options?: {
-      transform?: TransformOptions
-    }
-  ) {
-    const wantsTransformations = typeof options?.transform !== 'undefined'
-    const renderPath = wantsTransformations ? 'render/image' : 'object'
-    const queryString = this.transformOptsToQueryString(options?.transform || {})
-
-    return this.download(path, {
-      prefix: `${renderPath}/authenticated`,
-      queryString: queryString,
-    })
-  }
-
-  /**
    * Downloads a file.
    *
    * @param path The full path and file name of the file to be downloaded. For example `folder/image.png`.
-   * @deprecated use publicDownload or authenticatedDownload
+   * @param options.download download a transformed image
    */
   async download(
     path: string,
-    options?: {
-      prefix?: string
-      queryString?: string
-    }
+    options?: { transform?: TransformOptions }
   ): Promise<
     | {
         data: Blob
@@ -420,19 +374,17 @@ export default class StorageFileApi {
         error: StorageError
       }
   > {
+    const wantsTransformation = typeof options?.transform !== 'undefined'
+    const renderPath = wantsTransformation ? 'render/image/authenticated' : 'object'
+    const transformationQuery = this.transformOptsToQueryString(options?.transform || {})
+    const queryString = transformationQuery ? `?${transformationQuery}` : ''
+
     try {
       const _path = this._getFinalPath(path)
-      const renderPath = options?.prefix ?? 'object'
-      const queryString = options?.queryString
-
-      const res = await get(
-        this.fetch,
-        `${this.url}/${renderPath}/${_path}${queryString ? `?${queryString}` : ''}`,
-        {
-          headers: this.headers,
-          noResolveJson: true,
-        }
-      )
+      const res = await get(this.fetch, `${this.url}/${renderPath}/${_path}${queryString}`, {
+        headers: this.headers,
+        noResolveJson: true,
+      })
       const data = await res.blob()
       return { data, error: null }
     } catch (error) {
