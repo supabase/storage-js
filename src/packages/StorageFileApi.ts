@@ -265,7 +265,7 @@ export default class StorageFileApi {
    * @param path The file path, including the current file name. For example `folder/image.png`.
    * @param expiresIn The number of seconds until the signed URL expires. For example, `60` for a URL which is valid for one minute.
    * @param options.download triggers the file as a download if set to true. Set this parameter as the name of the file if you want to trigger the download with a different filename.
-   * @param options.transform The visiting client will receive the transformed variant of the image by providing transform options
+   * @param options.transform Transform the asset before serving it to the client.
    */
   async createSignedUrl(
     path: string,
@@ -359,7 +359,7 @@ export default class StorageFileApi {
    * Downloads a file.
    *
    * @param path The full path and file name of the file to be downloaded. For example `folder/image.png`.
-   * @param options.download download a transformed image
+   * @param options.transform Transform the asset before serving it to the client.
    */
   async download(
     path: string,
@@ -401,8 +401,8 @@ export default class StorageFileApi {
    * This function does not verify if the bucket is public. If a public URL is created for a bucket which is not public, you will not be able to download the asset.
    *
    * @param path The path and name of the file to generate the public URL for. For example `folder/image.png`.
-   * @param options.download triggers the file as a download if set to true. Set this parameter as the name of the file if you want to trigger the download with a different filename.
-   * @param options.transform adds image transformations parameters to the generated url
+   * @param options.download Triggers the file as a download if set to true. Set this parameter as the name of the file if you want to trigger the download with a different filename.
+   * @param options.transform Transform the asset before serving it to the client.
    */
   getPublicUrl(
     path: string,
