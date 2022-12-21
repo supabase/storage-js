@@ -420,6 +420,16 @@ describe('Object API', () => {
       ).rejects.toThrow()
     })
 
+    test('downloads an object as a stream', async () => {
+      await storage.from(bucketName).upload(uploadPath, file)
+      const res = await storage.from(bucketName).download(uploadPath, {
+        stream: true,
+      })
+
+      expect(res.error).toBeNull()
+      expect(res.data).toBeInstanceOf(ReadableStream)
+    })
+
     test('removes an object', async () => {
       await storage.from(bucketName).upload(uploadPath, file)
       const res = await storage.from(bucketName).remove([uploadPath])

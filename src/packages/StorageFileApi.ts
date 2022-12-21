@@ -521,13 +521,14 @@ export default class StorageFileApi {
    *
    * @param path The full path and file name of the file to be downloaded. For example `folder/image.png`.
    * @param options.transform Transform the asset before serving it to the client.
+   * @param options.stream If set to true, the response will be a ReadableStream. Otherwise, it will be a Blob (default).
    */
-  async download(
+  async download<Options extends { transform?: TransformOptions, stream?: boolean }>(
     path: string,
-    options?: { transform?: TransformOptions }
+    options?: Options
   ): Promise<
     | {
-        data: Blob
+        data: Options['stream'] extends true ? ReadableStream : Blob
         error: null
       }
     | {
@@ -546,8 +547,16 @@ export default class StorageFileApi {
         headers: this.headers,
         noResolveJson: true,
       })
-      const data = await res.blob()
-      return { data, error: null }
+
+      if (!options?.stream) {
+        const data = await res.blob()
+        return { data, error: null }
+      }
+
+      return {
+        data: res.body,
+        error: null,
+      }
     } catch (error) {
       if (this.shouldThrowOnError) {
         throw error
