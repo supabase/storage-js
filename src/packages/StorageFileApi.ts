@@ -1,3 +1,4 @@
+import { URL } from 'url'
 import { isStorageError, StorageError } from '../lib/errors'
 import { Fetch, get, post, remove } from '../lib/fetch'
 import { resolveFetch } from '../lib/helpers'
@@ -23,6 +24,18 @@ const DEFAULT_FILE_OPTIONS: FileOptions = {
   contentType: 'text/plain;charset=UTF-8',
   upsert: false,
 }
+
+type FileBody =
+  | ArrayBuffer
+  | ArrayBufferView
+  | Blob
+  | Buffer
+  | File
+  | FormData
+  | NodeJS.ReadableStream
+  | ReadableStream<Uint8Array>
+  | URLSearchParams
+  | string
 
 export default class StorageFileApi {
   protected url: string
@@ -52,17 +65,7 @@ export default class StorageFileApi {
   private async uploadOrUpdate(
     method: 'POST' | 'PUT',
     path: string,
-    fileBody:
-      | ArrayBuffer
-      | ArrayBufferView
-      | Blob
-      | Buffer
-      | File
-      | FormData
-      | NodeJS.ReadableStream
-      | ReadableStream<Uint8Array>
-      | URLSearchParams
-      | string,
+    fileBody: FileBody,
     fileOptions?: FileOptions
   ): Promise<
     | {
@@ -99,6 +102,64 @@ export default class StorageFileApi {
       const _path = this._getFinalPath(cleanPath)
       const res = await this.fetch(`${this.url}/object/${_path}`, {
         method,
+        body: body as BodyInit,
+        headers,
+      })
+
+      if (res.ok) {
+        return {
+          data: { path: cleanPath },
+          error: null,
+        }
+      } else {
+        const error = await res.json()
+        return { data: null, error }
+      }
+    } catch (error) {
+      if (isStorageError(error)) {
+        return { data: null, error }
+      }
+
+      throw error
+    }
+  }
+
+  async uploadToSignedUrl(
+    key: string,
+    token: string,
+    fileBody: FileBody,
+    fileOptions?: FileOptions
+  ) {
+    const cleanPath = this._removeEmptyFolders(key)
+    const _path = this._getFinalPath(cleanPath)
+
+    const url = new URL(this.url)
+    url.pathname = `/object/upload/sign/${_path}`
+    url.searchParams.set('token', token)
+
+    try {
+      let body
+      const options = { upsert: DEFAULT_FILE_OPTIONS.upsert, ...fileOptions }
+      const headers: Record<string, string> = {
+        ...this.headers,
+        ...{ 'x-upsert': String(options.upsert as boolean) },
+      }
+
+      if (typeof Blob !== 'undefined' && fileBody instanceof Blob) {
+        body = new FormData()
+        body.append('cacheControl', options.cacheControl as string)
+        body.append('', fileBody)
+      } else if (typeof FormData !== 'undefined' && fileBody instanceof FormData) {
+        body = fileBody
+        body.append('cacheControl', options.cacheControl as string)
+      } else {
+        body = fileBody
+        headers['cache-control'] = `max-age=${options.cacheControl}`
+        headers['content-type'] = options.contentType as string
+      }
+
+      const res = await this.fetch(url.toString(), {
+        method: 'PUT',
         body: body as BodyInit,
         headers,
       })
@@ -250,6 +311,54 @@ export default class StorageFileApi {
         { headers: this.headers }
       )
       return { data: { path: data.Key }, error: null }
+    } catch (error) {
+      if (isStorageError(error)) {
+        return { data: null, error }
+      }
+
+      throw error
+    }
+  }
+
+  /**
+   * Creates an upload signed URL. Use it to upload a file straight to the bucket without credentials
+   *
+   * @param path The file path, including the current file name. For example `folder/image.png`.
+   */
+  async createUploadSignedUrl(
+    path: string
+  ): Promise<
+    | {
+        data: { signedUrl: string; token: string; key: string }
+        error: null
+      }
+    | {
+        data: null
+        error: StorageError
+      }
+  > {
+    try {
+      let _path = this._getFinalPath(path)
+
+      const data = await post(
+        this.fetch,
+        `${this.url}/object/upload/sign/${_path}`,
+        {},
+        { headers: this.headers }
+      )
+
+      const url = new URL(this.url)
+      url.pathname = data.url
+
+      const token = url.searchParams.get('token')
+
+      if (!token) {
+        throw new StorageError('No token returned by API')
+      }
+
+      const key = url.pathname
+
+      return { data: { signedUrl: url.toString(), key, token }, error: null }
     } catch (error) {
       if (isStorageError(error)) {
         return { data: null, error }

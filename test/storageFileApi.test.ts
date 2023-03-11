@@ -74,6 +74,17 @@ describe('Object API', () => {
       expect(res.data?.signedUrl).toContain(`${URL}/object/sign/${bucketName}/${uploadPath}`)
     })
 
+    test('sign url for upload', async () => {
+      console.table({ bucketName, uploadPath })
+
+      const res = await storage.from(bucketName).createUploadSignedUrl(uploadPath)
+
+      expect(res.error).toBeNull()
+      expect(res.data?.key).toBe(uploadPath)
+      expect(res.data?.token).toBeDefined()
+      expect(res.data?.signedUrl).toContain(`${URL}/object/sign/upload/${bucketName}/${uploadPath}`)
+    })
+
     test('sign url with download querystring parameter', async () => {
       await storage.from(bucketName).upload(uploadPath, file)
       const res = await storage.from(bucketName).createSignedUrl(uploadPath, 2000, {
