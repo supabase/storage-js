@@ -28,6 +28,10 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
+      - name: Ensure build works
+        run: |
+          npm run build
+
       - name: Run tests
         run: |
           npm ci
