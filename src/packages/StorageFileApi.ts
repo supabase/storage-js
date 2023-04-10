@@ -213,6 +213,7 @@ export default class StorageFileApi {
   /**
    * Creates a signed upload URL.
    * Signed upload URLs can be used upload files to the bucket without further authentication.
+   * They are valid for one minute.
    * @param path The file path, including the current file name. For example `folder/image.png`.
    */
   async createSignedUploadUrl(
