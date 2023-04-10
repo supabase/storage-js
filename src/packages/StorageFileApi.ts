@@ -148,11 +148,10 @@ export default class StorageFileApi {
   }
 
   /**
-   * Upload a file to a bucket with a token generated from `createUploadSignedUrl`.
+   * Upload a file with a token generated from `createUploadSignedUrl`.
    * @param path The file path, including the file name. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
    * @param token The token generated from `createUploadSignedUrl`
    * @param fileBody The body of the file to be stored in the bucket.
-   * @param fileOptions The file options.
    */
   async uploadToSignedUrl(
     path: string,
@@ -212,8 +211,8 @@ export default class StorageFileApi {
   }
 
   /**
-   * Creates an upload signed URL. Use it to upload a file straight to the bucket without credentials
-   *
+   * Creates a signed upload URL.
+   * Signed upload URLs can be used upload files to the bucket without further authentication.
    * @param path The file path, including the current file name. For example `folder/image.png`.
    */
   async createSignedUploadUrl(
