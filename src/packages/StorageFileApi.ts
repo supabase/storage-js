@@ -219,7 +219,7 @@ export default class StorageFileApi {
     path: string
   ): Promise<
     | {
-        data: { signedUrl: string; token: string; key: string }
+        data: { signedUrl: string; token: string; path: string }
         error: null
       }
     | {
@@ -245,7 +245,7 @@ export default class StorageFileApi {
         throw new StorageError('No token returned by API')
       }
 
-      return { data: { signedUrl: url.toString(), key: path, token }, error: null }
+      return { data: { signedUrl: url.toString(), path, token }, error: null }
     } catch (error) {
       if (isStorageError(error)) {
         return { data: null, error }
