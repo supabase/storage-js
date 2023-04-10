@@ -222,7 +222,7 @@ describe('Object API', () => {
       const res = await storage.from(bucketName).createSignedUploadUrl(uploadPath)
 
       expect(res.error).toBeNull()
-      expect(res.data?.key).toBe(uploadPath)
+      expect(res.data?.path).toBe(uploadPath)
       expect(res.data?.token).toBeDefined()
       expect(res.data?.signedUrl).toContain(`${URL}/object/upload/sign/${bucketName}/${uploadPath}`)
     })
@@ -231,9 +231,11 @@ describe('Object API', () => {
       const { data, error } = await storage.from(bucketName).createSignedUploadUrl(uploadPath)
 
       expect(error).toBeNull()
-      assert(data?.key)
+      assert(data?.path)
 
-      const uploadRes = await storage.from(bucketName).uploadToSignedUrl(data.key, data.token, file)
+      const uploadRes = await storage
+        .from(bucketName)
+        .uploadToSignedUrl(data.path, data.token, file)
 
       expect(uploadRes.error).toBeNull()
       expect(uploadRes.data?.path).toEqual(uploadPath)
@@ -243,16 +245,18 @@ describe('Object API', () => {
       const { data, error } = await storage.from(bucketName).createSignedUploadUrl(uploadPath)
 
       expect(error).toBeNull()
-      assert(data?.key)
+      assert(data?.path)
 
-      const uploadRes = await storage.from(bucketName).uploadToSignedUrl(data.key, data.token, file)
+      const uploadRes = await storage
+        .from(bucketName)
+        .uploadToSignedUrl(data.path, data.token, file)
 
       expect(uploadRes.error).toBeNull()
       expect(uploadRes.data?.path).toEqual(uploadPath)
 
       const uploadRes2 = await storage
         .from(bucketName)
-        .uploadToSignedUrl(data.key, data.token, file)
+        .uploadToSignedUrl(data.path, data.token, file)
       expect(uploadRes2.error).toEqual({
         error: 'Duplicate',
         message: 'The resource already exists',
