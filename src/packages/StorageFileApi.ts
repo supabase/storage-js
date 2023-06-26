@@ -637,7 +637,7 @@ export default class StorageFileApi {
   // }
 
   /**
-   * Lists all the files within a bucket.
+   * Lists all the files and folders within a path of the bucket.
    * @param path The folder path.
    */
   async list(
