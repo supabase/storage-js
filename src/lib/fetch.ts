@@ -61,10 +61,15 @@ async function _handleRequest(
   return new Promise((resolve, reject) => {
     fetcher(url, _getRequestParams(method, options, parameters, body))
       .then(async (result) => {
-        const body = await result.text();
         if (!result.ok) throw result;
-        if (options?.noResolveJson) return result;
-        return JSON.parse(body);
+        const body = await result.text();
+        if (result.headers.get('content-type')?.includes('application/json')) {
+          return JSON.parse(body);
+        } else if (options?.noResolveJson) {
+          return result;
+        } else {
+          return body;
+        }
       })
       .then((data) => resolve(data))
       .catch((error) => handleError(error, reject));
