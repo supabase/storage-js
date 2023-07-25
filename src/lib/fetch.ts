@@ -62,16 +62,22 @@ async function _handleRequest(
     fetcher(url, _getRequestParams(method, options, parameters, body))
       .then(async (result) => {
         if (!result.ok) throw result;
-        const body = await result.text();
-        if (result.headers.get('content-type')?.includes('application/json')) {
-          return JSON.parse(body);
-        } else if (options?.noResolveJson) {
-          return result;
-        } else {
-          return body;
+        // Check content type of response
+        const contentType = result.headers.get('content-type');
+        // If the content type is JSON, parse the response as text and then parse that as JSON
+        if (contentType?.includes('application/json')) {
+          const resultText = await result.text();
+          resolve(options?.noResolveJson ? result : JSON.parse(resultText));
+        }
+        // If not JSON, check for options.noResolveJson. It either returns the blob result if set true or the parsed text
+        else if (options?.noResolveJson) {
+          resolve(result);
+        }
+        else {
+          const resultText = await result.text();
+          resolve(resultText);
         }
       })
-      .then((data) => resolve(data))
       .catch((error) => handleError(error, reject));
   });
 }
