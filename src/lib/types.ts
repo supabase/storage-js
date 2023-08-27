@@ -1,3 +1,5 @@
+import { StorageError } from './errors'
+
 export interface Bucket {
   id: string
   name: string
@@ -109,3 +111,28 @@ export interface TransformOptions {
    */
   format?: 'origin'
 }
+
+type StorageUploadResponseData =
+  | { path: string }
+  | { message: string }
+  | { signedUrl: string }
+  | {
+      signedUrl: string
+      token: string
+      path: string
+    }
+  | {
+      error: string | null
+      path: string | null
+      signedUrl: string
+    }[]
+
+export type StorageUploadResponse =
+  | {
+      data: StorageUploadResponseData
+      error: null
+    }
+  | {
+      data: null
+      error: StorageError
+    }

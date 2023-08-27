@@ -7,6 +7,7 @@ import {
   SearchOptions,
   FetchParameters,
   TransformOptions,
+  StorageUploadResponse,
 } from '../lib/types'
 
 const DEFAULT_SEARCH_OPTIONS = {
@@ -66,16 +67,7 @@ export default class StorageFileApi {
     path: string,
     fileBody: FileBody,
     fileOptions?: FileOptions
-  ): Promise<
-    | {
-        data: { path: string }
-        error: null
-      }
-    | {
-        data: null
-        error: StorageError
-      }
-  > {
+  ): Promise<StorageUploadResponse> {
     try {
       let body
       const options = { ...DEFAULT_FILE_OPTIONS, ...fileOptions }
@@ -134,16 +126,7 @@ export default class StorageFileApi {
     path: string,
     fileBody: FileBody,
     fileOptions?: FileOptions
-  ): Promise<
-    | {
-        data: { path: string }
-        error: null
-      }
-    | {
-        data: null
-        error: StorageError
-      }
-  > {
+  ): Promise<StorageUploadResponse> {
     return this.uploadOrUpdate('POST', path, fileBody, fileOptions)
   }
 
@@ -216,18 +199,7 @@ export default class StorageFileApi {
    * They are valid for 2 hours.
    * @param path The file path, including the current file name. For example `folder/image.png`.
    */
-  async createSignedUploadUrl(
-    path: string
-  ): Promise<
-    | {
-        data: { signedUrl: string; token: string; path: string }
-        error: null
-      }
-    | {
-        data: null
-        error: StorageError
-      }
-  > {
+  async createSignedUploadUrl(path: string): Promise<StorageUploadResponse> {
     try {
       let _path = this._getFinalPath(path)
 
@@ -276,16 +248,7 @@ export default class StorageFileApi {
       | URLSearchParams
       | string,
     fileOptions?: FileOptions
-  ): Promise<
-    | {
-        data: { path: string }
-        error: null
-      }
-    | {
-        data: null
-        error: StorageError
-      }
-  > {
+  ): Promise<StorageUploadResponse> {
     return this.uploadOrUpdate('PUT', path, fileBody, fileOptions)
   }
 
@@ -295,19 +258,7 @@ export default class StorageFileApi {
    * @param fromPath The original file path, including the current file name. For example `folder/image.png`.
    * @param toPath The new file path, including the new file name. For example `folder/image-new.png`.
    */
-  async move(
-    fromPath: string,
-    toPath: string
-  ): Promise<
-    | {
-        data: { message: string }
-        error: null
-      }
-    | {
-        data: null
-        error: StorageError
-      }
-  > {
+  async move(fromPath: string, toPath: string): Promise<StorageUploadResponse> {
     try {
       const data = await post(
         this.fetch,
@@ -331,19 +282,7 @@ export default class StorageFileApi {
    * @param fromPath The original file path, including the current file name. For example `folder/image.png`.
    * @param toPath The new file path, including the new file name. For example `folder/image-copy.png`.
    */
-  async copy(
-    fromPath: string,
-    toPath: string
-  ): Promise<
-    | {
-        data: { path: string }
-        error: null
-      }
-    | {
-        data: null
-        error: StorageError
-      }
-  > {
+  async copy(fromPath: string, toPath: string): Promise<StorageUploadResponse> {
     try {
       const data = await post(
         this.fetch,
@@ -373,16 +312,7 @@ export default class StorageFileApi {
     path: string,
     expiresIn: number,
     options?: { download?: string | boolean; transform?: TransformOptions }
-  ): Promise<
-    | {
-        data: { signedUrl: string }
-        error: null
-      }
-    | {
-        data: null
-        error: StorageError
-      }
-  > {
+  ): Promise<StorageUploadResponse> {
     try {
       let _path = this._getFinalPath(path)
 
@@ -418,16 +348,7 @@ export default class StorageFileApi {
     paths: string[],
     expiresIn: number,
     options?: { download: string | boolean }
-  ): Promise<
-    | {
-        data: { error: string | null; path: string | null; signedUrl: string }[]
-        error: null
-      }
-    | {
-        data: null
-        error: StorageError
-      }
-  > {
+  ): Promise<StorageUploadResponse> {
     try {
       const data = await post(
         this.fetch,
