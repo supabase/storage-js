@@ -132,20 +132,7 @@ export default class StorageFileApi {
    * @param path The file path, including the file name. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
    * @param fileBody The body of the file to be stored in the bucket.
    */
-  async upload(
-    path: string,
-    fileBody: FileBody,
-    fileOptions?: FileOptions
-  ): Promise<
-    | {
-        data: { path: string }
-        error: null
-      }
-    | {
-        data: null
-        error: StorageError
-      }
-  > {
+  async upload(path: string, fileBody: FileBody, fileOptions?: FileOptions) {
     return this.uploadOrUpdate('POST', path, fileBody, fileOptions)
   }
 
@@ -280,16 +267,7 @@ export default class StorageFileApi {
       | URLSearchParams
       | string,
     fileOptions?: FileOptions
-  ): Promise<
-    | {
-        data: { path: string }
-        error: null
-      }
-    | {
-        data: null
-        error: StorageError
-      }
-  > {
+  ) {
     return this.uploadOrUpdate('PUT', path, fileBody, fileOptions)
   }
 
