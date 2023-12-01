@@ -2,7 +2,7 @@ import { DEFAULT_HEADERS } from '../lib/constants'
 import { isStorageError, StorageError } from '../lib/errors'
 import { Fetch, get, post, put, remove } from '../lib/fetch'
 import { resolveFetch } from '../lib/helpers'
-import { Bucket } from '../lib/types'
+import { Bucket, StorageUploadResponse } from '../lib/types'
 
 export default class StorageBucketApi {
   protected url: string
@@ -143,16 +143,7 @@ export default class StorageBucketApi {
       fileSizeLimit?: number | string | null
       allowedMimeTypes?: string[] | null
     }
-  ): Promise<
-    | {
-        data: { message: string }
-        error: null
-      }
-    | {
-        data: null
-        error: StorageError
-      }
-  > {
+  ): Promise<StorageUploadResponse> {
     try {
       const data = await put(
         this.fetch,
@@ -181,18 +172,7 @@ export default class StorageBucketApi {
    *
    * @param id The unique identifier of the bucket you would like to empty.
    */
-  async emptyBucket(
-    id: string
-  ): Promise<
-    | {
-        data: { message: string }
-        error: null
-      }
-    | {
-        data: null
-        error: StorageError
-      }
-  > {
+  async emptyBucket(id: string): Promise<StorageUploadResponse> {
     try {
       const data = await post(
         this.fetch,
@@ -216,18 +196,7 @@ export default class StorageBucketApi {
    *
    * @param id The unique identifier of the bucket you would like to delete.
    */
-  async deleteBucket(
-    id: string
-  ): Promise<
-    | {
-        data: { message: string }
-        error: null
-      }
-    | {
-        data: null
-        error: StorageError
-      }
-  > {
+  async deleteBucket(id: string): Promise<StorageUploadResponse> {
     try {
       const data = await remove(
         this.fetch,
