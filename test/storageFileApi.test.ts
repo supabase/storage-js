@@ -1,11 +1,15 @@
-import { StorageClient } from '../src/index'
+import { StorageApiError, StorageClient } from '../src/index'
 import * as fsp from 'fs/promises'
 import * as fs from 'fs'
 import * as path from 'path'
 import FormData from 'form-data'
 import assert from 'assert'
 // @ts-ignore
+import { FileUrlStorage } from 'tus-js-client'
+// @ts-ignore
 import fetch from '@supabase/node-fetch'
+// @ts-ignore
+import { SlowReadableStream } from './helpers'
 
 // TODO: need to setup storage-api server for this test
 const URL = 'http://localhost:8000/storage/v1'
@@ -114,32 +118,40 @@ describe('Object API', () => {
     })
   })
 
-  describe('Upload files', () => {
+  describe('Upload files Standard', () => {
     test('uploading using form-data', async () => {
       const bucketName = await newBucket()
       const formData = new FormData()
       formData.append('file', file)
 
-      const res = await storage.from(bucketName).upload(uploadPath, formData)
+      const res = await storage.from(bucketName).upload(uploadPath, formData, {
+        forceStandardUpload: true,
+      })
       expect(res.error).toBeNull()
       expect(res.data?.path).toEqual(uploadPath)
     })
 
     test('uploading using buffer', async () => {
-      const res = await storage.from(bucketName).upload(uploadPath, file)
+      const res = await storage.from(bucketName).upload(uploadPath, file, {
+        forceStandardUpload: true,
+      })
       expect(res.error).toBeNull()
       expect(res.data?.path).toEqual(uploadPath)
     })
 
     test('uploading using array buffer', async () => {
-      const res = await storage.from(bucketName).upload(uploadPath, file.buffer)
+      const res = await storage.from(bucketName).upload(uploadPath, Buffer.from(file.buffer), {
+        forceStandardUpload: true,
+      })
       expect(res.error).toBeNull()
       expect(res.data?.path).toEqual(uploadPath)
     })
 
     test('uploading using blob', async () => {
       const fileBlob = new Blob([file])
-      const res = await storage.from(bucketName).upload(uploadPath, fileBlob)
+      const res = await storage.from(bucketName).upload(uploadPath, fileBlob, {
+        forceStandardUpload: true,
+      })
       expect(res.error).toBeNull()
       expect(res.data?.path).toEqual(uploadPath)
     })
@@ -147,7 +159,9 @@ describe('Object API', () => {
     test('uploading using readable stream', async () => {
       const file = await fs.createReadStream(uploadFilePath('file.txt'))
 
-      const res = await storage.from(bucketName).upload(uploadPath, file)
+      const res = await storage.from(bucketName).upload(uploadPath, file, {
+        forceStandardUpload: true,
+      })
       expect(res.error).toBeNull()
       expect(res.data?.path).toEqual(uploadPath)
     })
@@ -158,7 +172,9 @@ describe('Object API', () => {
       const res = await storage.from(bucketName).upload(uploadPath, file)
       expect(res.error).toBeNull()
 
-      const updateRes = await storage.from(bucketName).update(uploadPath, file2)
+      const updateRes = await storage.from(bucketName).update(uploadPath, file2, {
+        forceStandardUpload: true,
+      })
       expect(updateRes.error).toBeNull()
       expect(updateRes.data?.path).toEqual(uploadPath)
     })
@@ -170,7 +186,9 @@ describe('Object API', () => {
         fileSizeLimit: '1mb',
       })
 
-      const res = await storage.from(bucketName).upload(uploadPath, file)
+      const res = await storage.from(bucketName).upload(uploadPath, file, {
+        forceStandardUpload: true,
+      })
       expect(res.error).toBeNull()
     })
 
@@ -181,7 +199,9 @@ describe('Object API', () => {
         fileSizeLimit: '1kb',
       })
 
-      const res = await storage.from(bucketName).upload(uploadPath, file)
+      const res = await storage.from(bucketName).upload(uploadPath, file, {
+        forceStandardUpload: true,
+      })
       expect(res.error).toEqual({
         error: 'Payload too large',
         message: 'The object exceeded the maximum allowed size',
@@ -198,6 +218,7 @@ describe('Object API', () => {
 
       const res = await storage.from(bucketName).upload(uploadPath, file, {
         contentType: 'image/png',
+        forceStandardUpload: true,
       })
       expect(res.error).toBeNull()
     })
@@ -210,6 +231,7 @@ describe('Object API', () => {
       })
 
       const res = await storage.from(bucketName).upload(uploadPath, file, {
+        forceStandardUpload: true,
         contentType: 'image/jpeg',
       })
       expect(res.error).toEqual({
@@ -262,6 +284,122 @@ describe('Object API', () => {
         error: 'Duplicate',
         message: 'The resource already exists',
         statusCode: '409',
+      })
+    })
+  })
+
+  describe('Upload files TUS', () => {
+    test('upload and update file', async () => {
+      const file2 = await fsp.readFile(uploadFilePath('file-2.txt'))
+
+      const res = await storage.from(bucketName).upload(uploadPath, file)
+      expect(res.error).toBeNull()
+
+      const updateRes = await storage.from(bucketName).update(uploadPath, file2)
+      expect(updateRes.error).toBeNull()
+      expect(updateRes.data?.path).toEqual(uploadPath)
+    })
+
+    test('can upload a file within the file size limit', async () => {
+      const bucketName = 'with-limit' + Date.now()
+      await storage.createBucket(bucketName, {
+        public: true,
+        fileSizeLimit: '1mb',
+      })
+
+      const res = await storage.from(bucketName).upload(uploadPath, file)
+      expect(res.error).toBeNull()
+    })
+
+    test('cannot upload a file that exceed the file size limit', async () => {
+      const bucketName = 'with-limit' + Date.now()
+      await storage.createBucket(bucketName, {
+        public: true,
+        fileSizeLimit: '1kb',
+      })
+
+      const res = await storage.from(bucketName).upload(uploadPath, file)
+      const err = res.error as StorageApiError
+      expect(err.status).toEqual(413)
+      expect(err.message).toEqual('Request Entity Too Large\n')
+    })
+
+    test('can pause and resume a file', async () => {
+      const fileContent = Buffer.alloc(1024 * 1024 * 12)
+      const uploadPath = `testpath/file-${Date.now()}.txt`
+
+      let fileBody = new SlowReadableStream(fileContent, 1024 * 1024 * 2, 500)
+
+      const successSpy = jest.fn()
+      const errorSpy = jest.fn()
+
+      let resolveFn: () => void = () => {}
+      let rejectFn: (err: any) => void = () => {}
+
+      const uploadPromise = new Promise<void>((resolve, reject) => {
+        resolveFn = resolve
+        rejectFn = reject
+      })
+
+      const upload = storage.from(bucketName).createResumableUpload(uploadPath, fileBody, {
+        tusOptions: {
+          urlStorage: new FileUrlStorage(__dirname + '/.tus/fingerprints.info'),
+          fingerprint: async (file, options) => {
+            return options?.metadata?.objectName || ''
+          },
+          uploadSize: fileContent.length,
+        },
+        onSuccess: () => {
+          successSpy()
+          resolveFn()
+        },
+        onError: (err) => {
+          errorSpy()
+          rejectFn(err)
+        },
+      })
+
+      upload.start()
+
+      await new Promise((resolve) => setTimeout(resolve, 2100))
+      await upload?.pause()
+      await new Promise((resolve) => setTimeout(resolve, 100))
+
+      upload?.start()
+
+      await uploadPromise
+
+      expect(successSpy).toBeCalledTimes(1)
+    }, 10000)
+
+    test('can upload a file with a valid mime type', async () => {
+      const bucketName = 'with-limit' + Date.now()
+      await storage.createBucket(bucketName, {
+        public: true,
+        allowedMimeTypes: ['image/png'],
+      })
+
+      const res = await storage.from(bucketName).upload(uploadPath, file, {
+        contentType: 'image/png',
+      })
+      expect(res.error).toBeNull()
+    })
+
+    test('cannot upload a file an invalid mime type', async () => {
+      const bucketName = 'with-limit' + Date.now()
+      await storage.createBucket(bucketName, {
+        public: true,
+        allowedMimeTypes: ['image/png'],
+      })
+
+      const res = await storage.from(bucketName).upload(uploadPath, file, {
+        contentType: 'image/jpeg',
+      })
+      const err = res.error as StorageApiError
+      expect(err.toJSON()).toEqual({
+        name: 'StorageApiError',
+        message: 'mime type not supported',
+        status: 422,
       })
     })
   })

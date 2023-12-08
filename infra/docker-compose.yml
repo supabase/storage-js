@@ -30,7 +30,6 @@ services:
       GLOBAL_S3_BUCKET: supa-storage-testing  # name of s3 bucket where you want to store objects
       PGRST_JWT_SECRET: super-secret-jwt-token-with-at-least-32-characters-long
       DATABASE_URL: postgres://postgres:postgres@db:5432/postgres
-      PGOPTIONS: "-c search_path=storage"
       AWS_ACCESS_KEY_ID: replace-with-your-aws-key
       AWS_SECRET_ACCESS_KEY: replace-with-your-aws-secret
       FILE_SIZE_LIMIT: 52428800
@@ -38,7 +37,8 @@ services:
       FILE_STORAGE_BACKEND_PATH: /tmp/storage
       ENABLE_IMAGE_TRANSFORMATION: "true"
       IMGPROXY_URL: http://imgproxy:8080
-      DEBUG: "knex:*"
+      TUS_URL_PATH: /storage/v1/upload/resumable
+#      DEBUG: "knex:*"
     volumes:
       - assets-volume:/tmp/storage
     healthcheck:
