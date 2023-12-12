@@ -44,17 +44,20 @@ export default class StorageFileApi {
   protected headers: { [key: string]: string }
   protected bucketId?: string
   protected fetch: Fetch
+  protected getAccessToken?: () => Promise<string>
 
   constructor(
     url: string,
     headers: { [key: string]: string } = {},
     bucketId: string,
-    fetch?: Fetch
+    fetch?: Fetch,
+    getAccessToken?: () => Promise<string>
   ) {
     this.url = url
     this.headers = headers
     this.bucketId = bucketId
     this.fetch = resolveFetch(fetch)
+    this.getAccessToken = getAccessToken
   }
 
   /**
@@ -137,7 +140,7 @@ export default class StorageFileApi {
   ) {
     const authorizationHeader = this.headers?.authorization || this.headers?.Authorization
     return new TusUploader(this.url, this.bucketId as string, path, fileBody, {
-      authorization: authorizationHeader,
+      authorization: this.getAccessToken,
       ...fileOptions,
     } as TusUploadOptions)
   }
@@ -163,7 +166,7 @@ export default class StorageFileApi {
         error: StorageError
       }
   > {
-    const shouldUseTUS = isTusJSAvailable()
+    const shouldUseTUS = isTusJSAvailable() && typeof this.getAccessToken === 'function'
 
     if (shouldUseTUS && !fileOptions?.forceStandardUpload) {
       return new Promise((resolve, reject) => {

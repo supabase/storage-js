@@ -31,7 +31,7 @@ export interface TusUploadOptions {
   onSuccess: (response: SuccessResponse) => void
   onError?: (response: ErrorResponse) => void
   cacheControl?: number
-  authorization?: string
+  authorization?: () => Promise<string>
   formDataFileKey?: string
   tusOptions?: Pick<
     TusUpload['options'],
@@ -145,10 +145,6 @@ export class TusUploader {
     let contentType: string = ''
     let cacheControl: string = ''
 
-    if (options?.authorization) {
-      headers.authorization = options.authorization
-    }
-
     if (options?.upsert) {
       headers['x-upsert'] = 'true'
     }
@@ -165,6 +161,12 @@ export class TusUploader {
       removeFingerprintOnSuccess: true,
       storeFingerprintForResuming: true,
       headers: headers,
+      onBeforeRequest: async (req) => {
+        const authHeader = await options.authorization?.()
+        if (authHeader) {
+          req.setHeader('authorization', authHeader)
+        }
+      },
       chunkSize: 6 * 1024 * 1024,
       metadata: {
         bucketName: bucketId,
