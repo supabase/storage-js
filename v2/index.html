@@ -1,0 +1,117 @@
+<!DOCTYPE html><html class="default"><head><meta charSet="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>@supabase/storage-js</title><meta name="description" content="Documentation for @supabase/storage-js"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="assets/style.css"/><link rel="stylesheet" href="assets/highlight.css"/><script async src="assets/search.js" id="search-script"></script></head><body><script>document.body.classList.add(localStorage.getItem("tsd-theme") || "os")</script><header><div class="tsd-page-toolbar"><div class="container"><div class="table-wrap"><div class="table-cell" id="tsd-search" data-base="."><div class="field"><label for="tsd-search-field" class="tsd-widget search no-caption">Search</label><input type="text" id="tsd-search-field"/></div><ul class="results"><li class="state loading">Preparing search index...</li><li class="state failure">The search index is not available</li></ul><a href="index.html" class="title">@supabase/storage-js</a></div><div class="table-cell" id="tsd-widgets"><div id="tsd-filter"><a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a><div class="tsd-filter-group"><div class="tsd-select" id="tsd-filter-visibility"><span class="tsd-select-label">All</span><ul class="tsd-select-list"><li data-value="public">Public</li><li data-value="protected">Public/Protected</li><li data-value="private" class="selected">All</li></ul></div> <input type="checkbox" id="tsd-filter-inherited" checked/><label class="tsd-widget" for="tsd-filter-inherited">Inherited</label><input type="checkbox" id="tsd-filter-externals" checked/><label class="tsd-widget" for="tsd-filter-externals">Externals</label></div></div><a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a></div></div></div></div><div class="tsd-page-title"><div class="container"><h1> @supabase/storage-js </h1></div></div></header><div class="container container-main"><div class="row"><div class="col-8 col-content"><div class="tsd-panel tsd-typography">
+<a href="#storage-js" id="storage-js" style="color: inherit; text-decoration: none;">
+  <h1><code>storage-js</code></h1>
+</a>
+<p>JS Client library to interact with Supabase Storage.</p>
+<ul>
+<li>Documentation: <a href="https://supabase.io/docs/reference/javascript/storage-createbucket">https://supabase.io/docs/reference/javascript/storage-createbucket</a></li>
+</ul>
+
+<a href="#quick-start-guide" id="quick-start-guide" style="color: inherit; text-decoration: none;">
+  <h2>Quick Start Guide</h2>
+</a>
+
+<a href="#installing-the-module" id="installing-the-module" style="color: inherit; text-decoration: none;">
+  <h3>Installing the module</h3>
+</a>
+<pre><code class="language-bash"><span class="hl-0">npm install @supabase/storage-js</span>
+</code></pre>
+
+<a href="#connecting-to-the-storage-backend" id="connecting-to-the-storage-backend" style="color: inherit; text-decoration: none;">
+  <h3>Connecting to the storage backend</h3>
+</a>
+<pre><code class="language-js"><span class="hl-1">import</span><span class="hl-0"> { </span><span class="hl-2">StorageClient</span><span class="hl-0"> } </span><span class="hl-1">from</span><span class="hl-0"> </span><span class="hl-3">&#39;@supabase/storage-js&#39;</span><br/><br/><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">STORAGE_URL</span><span class="hl-0"> = </span><span class="hl-3">&#39;https://&lt;project_ref&gt;.supabase.co/storage/v1&#39;</span><br/><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">SERVICE_KEY</span><span class="hl-0"> = </span><span class="hl-3">&#39;&lt;service_role&gt;&#39;</span><span class="hl-0"> </span><span class="hl-6">//! service key, not anon key</span><br/><br/><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">storageClient</span><span class="hl-0"> = </span><span class="hl-4">new</span><span class="hl-0"> </span><span class="hl-7">StorageClient</span><span class="hl-0">(</span><span class="hl-5">STORAGE_URL</span><span class="hl-0">, {</span><br/><span class="hl-0">  </span><span class="hl-2">apikey:</span><span class="hl-0"> </span><span class="hl-5">SERVICE_KEY</span><span class="hl-0">,</span><br/><span class="hl-0">  </span><span class="hl-2">Authorization:</span><span class="hl-0"> </span><span class="hl-3">`Bearer </span><span class="hl-4">${</span><span class="hl-5">SERVICE_KEY</span><span class="hl-4">}</span><span class="hl-3">`</span><span class="hl-0">,</span><br/><span class="hl-0">})</span>
+</code></pre>
+
+<a href="#handling-resources" id="handling-resources" style="color: inherit; text-decoration: none;">
+  <h3>Handling resources</h3>
+</a>
+
+<a href="#handling-storage-buckets" id="handling-storage-buckets" style="color: inherit; text-decoration: none;">
+  <h4>Handling Storage Buckets</h4>
+</a>
+<ul>
+<li><p>Create a new Storage bucket:</p>
+<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> { </span><span class="hl-5">data</span><span class="hl-0">, </span><span class="hl-5">error</span><span class="hl-0"> } = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">storageClient</span><span class="hl-0">.</span><span class="hl-7">createBucket</span><span class="hl-0">(</span><br/><span class="hl-0">  </span><span class="hl-3">&#39;test_bucket&#39;</span><span class="hl-0">, </span><span class="hl-6">// Bucket name (must be unique)</span><br/><span class="hl-0">  { </span><span class="hl-2">public:</span><span class="hl-0"> </span><span class="hl-4">false</span><span class="hl-0"> } </span><span class="hl-6">// Bucket options</span><br/><span class="hl-0">)</span>
+</code></pre>
+</li>
+<li><p>Retrieve the details of an existing Storage bucket:</p>
+<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> { </span><span class="hl-5">data</span><span class="hl-0">, </span><span class="hl-5">error</span><span class="hl-0"> } = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">storageClient</span><span class="hl-0">.</span><span class="hl-7">getBucket</span><span class="hl-0">(</span><span class="hl-3">&#39;test_bucket&#39;</span><span class="hl-0">)</span>
+</code></pre>
+</li>
+<li><p>Update a new Storage bucket:</p>
+<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> { </span><span class="hl-5">data</span><span class="hl-0">, </span><span class="hl-5">error</span><span class="hl-0"> } = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">storageClient</span><span class="hl-0">.</span><span class="hl-7">updateBucket</span><span class="hl-0">(</span><br/><span class="hl-0">  </span><span class="hl-3">&#39;test_bucket&#39;</span><span class="hl-0">, </span><span class="hl-6">// Bucket name</span><br/><span class="hl-0">  { </span><span class="hl-2">public:</span><span class="hl-0"> </span><span class="hl-4">false</span><span class="hl-0"> } </span><span class="hl-6">// Bucket options</span><br/><span class="hl-0">)</span>
+</code></pre>
+</li>
+<li><p>Remove all objects inside a single bucket:</p>
+<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> { </span><span class="hl-5">data</span><span class="hl-0">, </span><span class="hl-5">error</span><span class="hl-0"> } = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">storageClient</span><span class="hl-0">.</span><span class="hl-7">emptyBucket</span><span class="hl-0">(</span><span class="hl-3">&#39;test_bucket&#39;</span><span class="hl-0">)</span>
+</code></pre>
+</li>
+<li><p>Delete an existing bucket (a bucket can&#39;t be deleted with existing objects inside it):</p>
+<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> { </span><span class="hl-5">data</span><span class="hl-0">, </span><span class="hl-5">error</span><span class="hl-0"> } = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">storageClient</span><span class="hl-0">.</span><span class="hl-7">deleteBucket</span><span class="hl-0">(</span><span class="hl-3">&#39;test_bucket&#39;</span><span class="hl-0">)</span>
+</code></pre>
+</li>
+<li><p>Retrieve the details of all Storage buckets within an existing project:</p>
+<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> { </span><span class="hl-5">data</span><span class="hl-0">, </span><span class="hl-5">error</span><span class="hl-0"> } = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">storageClient</span><span class="hl-0">.</span><span class="hl-7">listBuckets</span><span class="hl-0">()</span>
+</code></pre>
+</li>
+</ul>
+
+<a href="#handling-files" id="handling-files" style="color: inherit; text-decoration: none;">
+  <h4>Handling Files</h4>
+</a>
+<ul>
+<li><p>Upload a file to an existing bucket:</p>
+<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">fileBody</span><span class="hl-0"> = ... </span><span class="hl-6">// load your file here</span><br/><br/><span class="hl-4">const</span><span class="hl-0"> { </span><span class="hl-5">data</span><span class="hl-0">, </span><span class="hl-5">error</span><span class="hl-0"> } = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">storageClient</span><span class="hl-0">.</span><span class="hl-7">from</span><span class="hl-0">(</span><span class="hl-3">&#39;bucket&#39;</span><span class="hl-0">).</span><span class="hl-7">upload</span><span class="hl-0">(</span><span class="hl-3">&#39;path/to/file&#39;</span><span class="hl-0">, </span><span class="hl-2">fileBody</span><span class="hl-0">)</span>
+</code></pre>
+<blockquote>
+<p>Note:<br>The path in <code>data.Key</code> is prefixed by the bucket ID and is not the value which should be passed to the <code>download</code> method in order to fetch the file.<br>To fetch the file via the <code>download</code> method, use <code>data.path</code> and <code>data.bucketId</code> as follows:</p>
+<pre><code class="language-javascript"><span class="hl-4">const</span><span class="hl-0"> { </span><span class="hl-5">data</span><span class="hl-0">, </span><span class="hl-5">error</span><span class="hl-0"> } = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">storageClient</span><span class="hl-0">.</span><span class="hl-7">from</span><span class="hl-0">(</span><span class="hl-3">&#39;bucket&#39;</span><span class="hl-0">).</span><span class="hl-7">upload</span><span class="hl-0">(</span><span class="hl-3">&#39;/folder/file.txt&#39;</span><span class="hl-0">, </span><span class="hl-2">fileBody</span><span class="hl-0">)</span><br/><span class="hl-6">// check for errors</span><br/><span class="hl-4">const</span><span class="hl-0"> { </span><span class="hl-5">data2</span><span class="hl-0">, </span><span class="hl-5">error2</span><span class="hl-0"> } = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">storageClient</span><span class="hl-0">.</span><span class="hl-7">from</span><span class="hl-0">(</span><span class="hl-2">data</span><span class="hl-0">.</span><span class="hl-2">bucketId</span><span class="hl-0">).</span><span class="hl-7">download</span><span class="hl-0">(</span><span class="hl-2">data</span><span class="hl-0">.</span><span class="hl-2">path</span><span class="hl-0">)</span>
+</code></pre>
+</blockquote>
+<blockquote>
+<p>Note: The <code>upload</code> method also accepts a map of optional parameters. For a complete list see the <a href="https://supabase.com/docs/reference/javascript/storage-from-upload">Supabase API reference</a>.</p>
+</blockquote>
+</li>
+<li><p>Download a file from an exisiting bucket:</p>
+<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> { </span><span class="hl-5">data</span><span class="hl-0">, </span><span class="hl-5">error</span><span class="hl-0"> } = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">storageClient</span><span class="hl-0">.</span><span class="hl-7">from</span><span class="hl-0">(</span><span class="hl-3">&#39;bucket&#39;</span><span class="hl-0">).</span><span class="hl-7">download</span><span class="hl-0">(</span><span class="hl-3">&#39;path/to/file&#39;</span><span class="hl-0">)</span>
+</code></pre>
+</li>
+<li><p>List all the files within a bucket:</p>
+<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> { </span><span class="hl-5">data</span><span class="hl-0">, </span><span class="hl-5">error</span><span class="hl-0"> } = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">storageClient</span><span class="hl-0">.</span><span class="hl-7">from</span><span class="hl-0">(</span><span class="hl-3">&#39;bucket&#39;</span><span class="hl-0">).</span><span class="hl-7">list</span><span class="hl-0">(</span><span class="hl-3">&#39;folder&#39;</span><span class="hl-0">)</span>
+</code></pre>
+<blockquote>
+<p>Note: The <code>list</code> method also accepts a map of optional parameters. For a complete list see the <a href="https://supabase.com/docs/reference/javascript/storage-from-list">Supabase API reference</a>.</p>
+</blockquote>
+</li>
+<li><p>Replace an existing file at the specified path with a new one:</p>
+<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">fileBody</span><span class="hl-0"> = ... </span><span class="hl-6">// load your file here</span><br/><br/><span class="hl-4">const</span><span class="hl-0"> { </span><span class="hl-5">data</span><span class="hl-0">, </span><span class="hl-5">error</span><span class="hl-0"> } = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">storageClient</span><br/><span class="hl-0">  .</span><span class="hl-7">from</span><span class="hl-0">(</span><span class="hl-3">&#39;bucket&#39;</span><span class="hl-0">)</span><br/><span class="hl-0">  .</span><span class="hl-7">update</span><span class="hl-0">(</span><span class="hl-3">&#39;path/to/file&#39;</span><span class="hl-0">, </span><span class="hl-2">fileBody</span><span class="hl-0">)</span>
+</code></pre>
+<blockquote>
+<p>Note: The <code>upload</code> method also accepts a map of optional parameters. For a complete list see the <a href="https://supabase.com/docs/reference/javascript/storage-from-upload">Supabase API reference</a>.</p>
+</blockquote>
+</li>
+<li><p>Move an existing file:</p>
+<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> { </span><span class="hl-5">data</span><span class="hl-0">, </span><span class="hl-5">error</span><span class="hl-0"> } = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">storageClient</span><br/><span class="hl-0">  .</span><span class="hl-7">from</span><span class="hl-0">(</span><span class="hl-3">&#39;bucket&#39;</span><span class="hl-0">)</span><br/><span class="hl-0">  .</span><span class="hl-7">move</span><span class="hl-0">(</span><span class="hl-3">&#39;old/path/to/file&#39;</span><span class="hl-0">, </span><span class="hl-3">&#39;new/path/to/file&#39;</span><span class="hl-0">)</span>
+</code></pre>
+</li>
+<li><p>Delete files within the same bucket:</p>
+<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> { </span><span class="hl-5">data</span><span class="hl-0">, </span><span class="hl-5">error</span><span class="hl-0"> } = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">storageClient</span><span class="hl-0">.</span><span class="hl-7">from</span><span class="hl-0">(</span><span class="hl-3">&#39;bucket&#39;</span><span class="hl-0">).</span><span class="hl-7">remove</span><span class="hl-0">([</span><span class="hl-3">&#39;path/to/file&#39;</span><span class="hl-0">])</span>
+</code></pre>
+</li>
+<li><p>Create signed URL to download file without requiring permissions:</p>
+<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> </span><span class="hl-5">expireIn</span><span class="hl-0"> = </span><span class="hl-8">60</span><br/><br/><span class="hl-4">const</span><span class="hl-0"> { </span><span class="hl-5">data</span><span class="hl-0">, </span><span class="hl-5">error</span><span class="hl-0"> } = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">storageClient</span><br/><span class="hl-0">  .</span><span class="hl-7">from</span><span class="hl-0">(</span><span class="hl-3">&#39;bucket&#39;</span><span class="hl-0">)</span><br/><span class="hl-0">  .</span><span class="hl-7">createSignedUrl</span><span class="hl-0">(</span><span class="hl-3">&#39;path/to/file&#39;</span><span class="hl-0">, </span><span class="hl-2">expireIn</span><span class="hl-0">)</span>
+</code></pre>
+</li>
+<li><p>Retrieve URLs for assets in public buckets:</p>
+<pre><code class="language-js"><span class="hl-4">const</span><span class="hl-0"> { </span><span class="hl-5">data</span><span class="hl-0">, </span><span class="hl-5">error</span><span class="hl-0"> } = </span><span class="hl-1">await</span><span class="hl-0"> </span><span class="hl-2">storageClient</span><span class="hl-0">.</span><span class="hl-7">from</span><span class="hl-0">(</span><span class="hl-3">&#39;public-bucket&#39;</span><span class="hl-0">).</span><span class="hl-7">getPublicUrl</span><span class="hl-0">(</span><span class="hl-3">&#39;path/to/file&#39;</span><span class="hl-0">)</span>
+</code></pre>
+</li>
+</ul>
+
+<a href="#sponsors" id="sponsors" style="color: inherit; text-decoration: none;">
+  <h2>Sponsors</h2>
+</a>
+<p>We are building the features of Firebase using enterprise-grade, open source products. We support existing communities wherever possible, and if the products don’t exist we build them and open source them ourselves. Thanks to these sponsors who are making the OSS ecosystem better for everyone.</p>
+<p><a href="https://github.com/sponsors/supabase"><img src="https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png" alt="New Sponsor"></a></p>
+</div></div><div class="col-4 col-menu menu-sticky-wrap menu-highlight"><nav class="tsd-navigation primary"><ul><li class="current"><a href="modules.html">Modules</a></li><li class=" tsd-kind-module"><a href="modules/index.html">index</a></li><li class=" tsd-kind-module"><a href="modules/packages_StorageBucketApi.html">packages/<wbr/>Storage<wbr/>Bucket<wbr/>Api</a></li><li class=" tsd-kind-module"><a href="modules/packages_StorageFileApi.html">packages/<wbr/>Storage<wbr/>File<wbr/>Api</a></li></ul></nav></div></div></div><footer class="with-border-bottom"><div class="container"><h2>Legend</h2><div class="tsd-legend-group"><ul class="tsd-legend"><li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li></ul><ul class="tsd-legend"><li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li></ul><ul class="tsd-legend"><li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li></ul></div><h2>Settings</h2><p>Theme <select id="theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></p></div></footer><div class="container tsd-generator"><p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></div><div class="overlay"></div><script src="assets/main.js"></script></body></html>
