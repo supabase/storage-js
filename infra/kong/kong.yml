@@ -23,6 +23,11 @@ services:
           - /storage/v1/
     plugins:
       - name: cors
+      - name: request-transformer
+        config:
+          add:
+            headers:
+              - 'Forwarded: host=localhost:8000;proto=http'
 consumers:
   - username: 'private-key'
     keyauth_credentials:

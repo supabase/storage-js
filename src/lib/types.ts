@@ -43,6 +43,11 @@ export interface FileOptions {
    * The duplex option is a string parameter that enables or disables duplex streaming, allowing for both reading and writing data in the same stream. It can be passed as an option to the fetch() method.
    */
   duplex?: string
+
+  /**
+   * The signal option allows you to communicate with a DOM request (such as a Fetch) and abort it if required via an AbortController object.
+   */
+  signal?: AbortSignal
 }
 
 export interface SearchOptions {
@@ -109,3 +114,15 @@ export interface TransformOptions {
    */
   format?: 'origin'
 }
+
+export type FileBody =
+  | ArrayBuffer
+  | ArrayBufferView
+  | Blob
+  | Buffer
+  | File
+  | FormData
+  | NodeJS.ReadableStream
+  | ReadableStream<Uint8Array>
+  | URLSearchParams
+  | string

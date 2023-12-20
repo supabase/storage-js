@@ -3,6 +3,9 @@ const path = require('path')
 
 module.exports = {
   entry: './src/index.ts',
+  externals: {
+    'tus-js-client': 'tus-js-client',
+  },
   output: {
     path: path.resolve(__dirname, 'dist/umd'),
     filename: 'supabase.js',

@@ -7,7 +7,12 @@ import {
   SearchOptions,
   FetchParameters,
   TransformOptions,
-} from '../lib/types'
+  FileBody,
+  TusUploader,
+  TusUploadOptions,
+  TusUploadOptionFallback,
+  isTusJSAvailable,
+} from '../lib'
 
 const DEFAULT_SEARCH_OPTIONS = {
   limit: 100,
@@ -24,17 +29,15 @@ const DEFAULT_FILE_OPTIONS: FileOptions = {
   upsert: false,
 }
 
-type FileBody =
-  | ArrayBuffer
-  | ArrayBufferView
-  | Blob
-  | Buffer
-  | File
-  | FormData
-  | NodeJS.ReadableStream
-  | ReadableStream<Uint8Array>
-  | URLSearchParams
-  | string
+export type UploadOptions<
+  T extends TusUploadOptionFallback<FileOptions> = TusUploadOptionFallback<FileOptions>
+> = T extends FileOptions
+  ? FileOptions
+  : (FileOptions & { forceStandardUpload: true }) | (T & { forceStandardUpload?: false })
+
+interface WithAbortSignal {
+  signal?: AbortSignal
+}
 
 export default class StorageFileApi {
   protected url: string
@@ -45,7 +48,7 @@ export default class StorageFileApi {
   constructor(
     url: string,
     headers: { [key: string]: string } = {},
-    bucketId?: string,
+    bucketId: string,
     fetch?: Fetch
   ) {
     this.url = url
@@ -68,7 +71,7 @@ export default class StorageFileApi {
     fileOptions?: FileOptions
   ): Promise<
     | {
-        data: { id: string, path: string, fullPath: string }
+        data: { id: string; path: string; fullPath: string }
         error: null
       }
     | {
@@ -103,6 +106,7 @@ export default class StorageFileApi {
         method,
         body: body as BodyInit,
         headers,
+        signal: fileOptions?.signal,
         ...(options?.duplex ? { duplex: options.duplex } : {}),
       })
 
@@ -126,16 +130,29 @@ export default class StorageFileApi {
     }
   }
 
+  createResumableUpload(
+    path: string,
+    fileBody: FileBody,
+    fileOptions?: Omit<TusUploadOptions, 'url' | 'authorization'>
+  ) {
+    const authorizationHeader = this.headers?.authorization || this.headers?.Authorization
+    return new TusUploader(this.url, this.bucketId as string, path, fileBody, {
+      authorization: authorizationHeader,
+      ...fileOptions,
+    } as TusUploadOptions)
+  }
+
   /**
    * Uploads a file to an existing bucket.
    *
    * @param path The file path, including the file name. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
    * @param fileBody The body of the file to be stored in the bucket.
+   * @param fileOptions
    */
   async upload(
     path: string,
     fileBody: FileBody,
-    fileOptions?: FileOptions
+    fileOptions?: UploadOptions & WithAbortSignal
   ): Promise<
     | {
         data: { id: string, path: string, fullPath: string }
@@ -146,7 +163,41 @@ export default class StorageFileApi {
         error: StorageError
       }
   > {
-    return this.uploadOrUpdate('POST', path, fileBody, fileOptions)
+    const shouldUseTUS = isTusJSAvailable()
+
+    if (shouldUseTUS && !fileOptions?.forceStandardUpload) {
+      return new Promise((resolve, reject) => {
+        const abortHandler = () => {
+          upload.abort()
+          reject(new StorageError('Upload Aborted'))
+        }
+
+        const upload = this.createResumableUpload(path, fileBody, {
+          ...(fileOptions as TusUploadOptions),
+          onSuccess: (...args) => {
+            fileOptions?.signal?.removeEventListener('abort', abortHandler)
+            resolve(...args)
+          },
+          onError: (...args) => {
+            fileOptions?.signal?.removeEventListener('abort', abortHandler)
+            resolve(...args)
+          },
+        })
+
+        fileOptions?.signal?.addEventListener('abort', () => {
+          if (fileOptions?.signal?.reason) {
+            upload.abort()
+          } else {
+            upload.pause()
+          }
+          reject(new StorageError('Upload Aborted'))
+        })
+
+        upload.startOrResume()
+      })
+    }
+
+    return this.uploadOrUpdate('POST', path, fileBody, fileOptions as FileOptions)
   }
 
   /**
@@ -279,7 +330,7 @@ export default class StorageFileApi {
       | ReadableStream<Uint8Array>
       | URLSearchParams
       | string,
-    fileOptions?: FileOptions
+    fileOptions?: UploadOptions & WithAbortSignal
   ): Promise<
     | {
         data: { id: string, path: string, fullPath: string }
@@ -290,7 +341,42 @@ export default class StorageFileApi {
         error: StorageError
       }
   > {
-    return this.uploadOrUpdate('PUT', path, fileBody, fileOptions)
+    const shouldUseTus = isTusJSAvailable()
+
+    if (shouldUseTus && !fileOptions?.forceStandardUpload) {
+      return new Promise((resolve, reject) => {
+        const abortHandler = () => {
+          upload.abort()
+          reject(new StorageError('Upload Aborted'))
+        }
+
+        const upload = this.createResumableUpload(path, fileBody, {
+          ...(fileOptions as TusUploadOptions),
+          upsert: true,
+          onSuccess: (...args) => {
+            fileOptions?.signal?.removeEventListener('abort', abortHandler)
+            resolve(...args)
+          },
+          onError: (...args) => {
+            fileOptions?.signal?.removeEventListener('abort', abortHandler)
+            resolve(...args)
+          },
+        })
+
+        fileOptions?.signal?.addEventListener('abort', () => {
+          if (fileOptions?.signal?.reason) {
+            upload.abort()
+          } else {
+            upload.pause()
+          }
+          reject(new StorageError('Upload Aborted'))
+        })
+
+        upload.startOrResume()
+      })
+    }
+
+    return this.uploadOrUpdate('PUT', path, fileBody, fileOptions as FileOptions)
   }
 
   /**
