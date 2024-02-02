@@ -35,6 +35,7 @@ services:
       AWS_SECRET_ACCESS_KEY: replace-with-your-aws-secret
       FILE_SIZE_LIMIT: 52428800
       STORAGE_BACKEND: file
+      DB_INSTALL_ROLES: true
       FILE_STORAGE_BACKEND_PATH: /tmp/storage
       ENABLE_IMAGE_TRANSFORMATION: "true"
       IMGPROXY_URL: http://imgproxy:8080
@@ -43,9 +44,11 @@ services:
       - assets-volume:/tmp/storage
     healthcheck:
       test: ['CMD-SHELL', 'curl -f -LI http://localhost:5000/status']
+      interval: 5s
+      timeout: 5s
+      retries: 5
   db:
-    build:
-      context: ./postgres
+    image: postgres:15
     ports:
       - 5432:5432
     command:
@@ -62,6 +65,26 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  dummy_data:
+    image: postgres:15
+    volumes:
+      - ./postgres/:/docker-entrypoint-initdb.d/
+    command:
+      - psql
+      - "postgres://postgres:postgres@db:5432/postgres"
+      - -f
+      - /docker-entrypoint-initdb.d/0-auth-schema.sql
+      - -f
+      - /docker-entrypoint-initdb.d/1-dummy-data.sql
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_PORT: 5432
+    depends_on:
+      storage:
+        condition: service_healthy
 
   imgproxy:
     image: darthsim/imgproxy

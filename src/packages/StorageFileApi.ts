@@ -68,7 +68,7 @@ export default class StorageFileApi {
     fileOptions?: FileOptions
   ): Promise<
     | {
-        data: { id: string, path: string, fullPath: string }
+        data: { id: string; path: string; fullPath: string }
         error: null
       }
     | {
@@ -87,7 +87,7 @@ export default class StorageFileApi {
       if (typeof Blob !== 'undefined' && fileBody instanceof Blob) {
         body = new FormData()
         body.append('cacheControl', options.cacheControl as string)
-        body.append('', fileBody)
+        body.append('', fileBody, '')
       } else if (typeof FormData !== 'undefined' && fileBody instanceof FormData) {
         body = fileBody
         body.append('cacheControl', options.cacheControl as string)
@@ -138,7 +138,7 @@ export default class StorageFileApi {
     fileOptions?: FileOptions
   ): Promise<
     | {
-        data: { id: string, path: string, fullPath: string }
+        data: { id: string; path: string; fullPath: string }
         error: null
       }
     | {
@@ -282,7 +282,7 @@ export default class StorageFileApi {
     fileOptions?: FileOptions
   ): Promise<
     | {
-        data: { id: string, path: string, fullPath: string }
+        data: { id: string; path: string; fullPath: string }
         error: null
       }
     | {

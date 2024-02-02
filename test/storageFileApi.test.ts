@@ -131,6 +131,13 @@ describe('Object API', () => {
       expect(res.data?.path).toEqual(uploadPath)
     })
 
+    test('uploading using blob', async () => {
+      const blob = new Blob([file])
+      const res = await storage.from(bucketName).upload(uploadPath, blob)
+      expect(res.error).toBeNull()
+      expect(res.data?.path).toEqual(uploadPath)
+    })
+
     test('uploading using array buffer', async () => {
       const res = await storage.from(bucketName).upload(uploadPath, file.buffer)
       expect(res.error).toBeNull()
@@ -214,7 +221,7 @@ describe('Object API', () => {
       })
       expect(res.error).toEqual({
         error: 'invalid_mime_type',
-        message: 'mime type not supported',
+        message: 'mime type image/jpeg is not supported',
         statusCode: '422',
       })
     })
