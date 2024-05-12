@@ -61,12 +61,15 @@ export default class StorageFileApi {
    * @param method HTTP method.
    * @param path The relative file path. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
    * @param fileBody The body of the file to be stored in the bucket.
+   * @param fileOptions The file options.
+   * @param parameters The fetch parameters.
    */
   private async uploadOrUpdate(
     method: 'POST' | 'PUT',
     path: string,
     fileBody: FileBody,
-    fileOptions?: FileOptions
+    fileOptions?: FileOptions,
+    parameters?: FetchParameters
   ): Promise<
     | {
         data: { id: string; path: string; fullPath: string }
@@ -105,6 +108,7 @@ export default class StorageFileApi {
         body: body as BodyInit,
         headers,
         ...(options?.duplex ? { duplex: options.duplex } : {}),
+        ...(parameters?.signal ? { signal: parameters.signal } : {}),
       })
 
       const data = await res.json()
@@ -132,11 +136,14 @@ export default class StorageFileApi {
    *
    * @param path The file path, including the file name. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
    * @param fileBody The body of the file to be stored in the bucket.
+   * @param fileOptions The file options.
+   * @param parameters The fetch parameters.
    */
   async upload(
     path: string,
     fileBody: FileBody,
-    fileOptions?: FileOptions
+    fileOptions?: FileOptions,
+    parameters?: FetchParameters
   ): Promise<
     | {
         data: { id: string; path: string; fullPath: string }
@@ -147,7 +154,7 @@ export default class StorageFileApi {
         error: StorageError
       }
   > {
-    return this.uploadOrUpdate('POST', path, fileBody, fileOptions)
+    return this.uploadOrUpdate('POST', path, fileBody, fileOptions, parameters)
   }
 
   /**
@@ -274,6 +281,8 @@ export default class StorageFileApi {
    *
    * @param path The relative file path. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to update.
    * @param fileBody The body of the file to be stored in the bucket.
+   * @param fileOptions The file options.
+   * @param parameters The fetch parameters.
    */
   async update(
     path: string,
@@ -288,7 +297,8 @@ export default class StorageFileApi {
       | ReadableStream<Uint8Array>
       | URLSearchParams
       | string,
-    fileOptions?: FileOptions
+    fileOptions?: FileOptions,
+    parameters?: FetchParameters
   ): Promise<
     | {
         data: { id: string; path: string; fullPath: string }
@@ -299,7 +309,7 @@ export default class StorageFileApi {
         error: StorageError
       }
   > {
-    return this.uploadOrUpdate('PUT', path, fileBody, fileOptions)
+    return this.uploadOrUpdate('PUT', path, fileBody, fileOptions, parameters)
   }
 
   /**
