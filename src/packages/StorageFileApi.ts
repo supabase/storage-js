@@ -180,7 +180,7 @@ export default class StorageFileApi {
       md: 'text/markdown',
     }
 
-    return extension ? mimeTypes[extension] : 'application/octet-stream'
+    return extension && mimeTypes[extension] ? mimeTypes[extension] : ''
   }
 
   /**
