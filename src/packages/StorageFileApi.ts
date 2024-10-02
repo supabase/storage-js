@@ -1,6 +1,7 @@
 import { isStorageError, StorageError, StorageUnknownError } from '../lib/errors'
 import { Fetch, get, head, post, remove } from '../lib/fetch'
 import { recursiveToCamel, resolveFetch } from '../lib/helpers'
+import { lookup } from 'mime-types'
 import {
   FileObject,
   FileOptions,
@@ -170,17 +171,9 @@ export default class StorageFileApi {
   }
 
   private _getExpectedContentType(path: string): string {
-    const extension = path.split('.').pop()?.toLowerCase()
-    const mimeTypes: { [key: string]: string } = {
-      png: 'image/png',
-      jpg: 'image/jpeg',
-      jpeg: 'image/jpeg',
-      gif: 'image/gif',
-      pdf: 'application/pdf',
-      md: 'text/markdown',
-    }
-
-    return extension && mimeTypes[extension] ? mimeTypes[extension] : ''
+    const extension = path.split('.').pop() || ''
+    const mimeType = lookup(extension)
+    return mimeType || ''
   }
 
   /**
