@@ -12,19 +12,19 @@ export function isStorageError(error: unknown): error is StorageError {
 }
 
 export class StorageApiError extends StorageError {
-  status: number
+  statusCode: string
 
-  constructor(message: string, status: number) {
+  constructor(message: string, statusCode: string) {
     super(message)
     this.name = 'StorageApiError'
-    this.status = status
+    this.statusCode = statusCode
   }
 
   toJSON() {
     return {
       name: this.name,
       message: this.message,
-      status: this.status,
+      statusCode: this.statusCode,
     }
   }
 }
