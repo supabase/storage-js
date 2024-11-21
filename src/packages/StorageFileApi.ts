@@ -121,7 +121,7 @@ export default class StorageFileApi {
       const data = await (method == 'PUT' ? put : post)(
         this.fetch,
         `${this.url}/object/${_path}`,
-        body,
+        body as object,
         { headers, ...(options?.duplex ? { duplex: options.duplex } : {}) }
       )
 
@@ -203,7 +203,7 @@ export default class StorageFileApi {
       const data = await put(
         this.fetch,
         url.toString(),
-        body,
+        body as object,
         { headers }
       )
 
