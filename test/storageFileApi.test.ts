@@ -305,6 +305,23 @@ describe('Object API', () => {
         statusCode: '409',
       })
     })
+
+    describe('Abort upload functionality', () => {
+      it('should abort the upload when an abort signal is sent', async () => {
+        const abortController = new AbortController()
+        const { signal } = abortController
+        const file = new Blob(['file contents'], { type: 'text/plain' })
+
+        const uploadPromise = storage
+          .from('bucketName')
+          .upload('path/to/file.txt', file, {}, { signal })
+
+        // Abort the request shortly after starting it
+        setTimeout(() => abortController.abort(), 50)
+
+        await expect(uploadPromise).rejects.toThrow('AbortError')
+      })
+    })
   })
 
   describe('Error handling', () => {
