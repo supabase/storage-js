@@ -770,6 +770,58 @@ export default class StorageFileApi {
     }
   }
 
+  /**
+   * Purges the cache for a specific object or entire bucket from the CDN.
+   *
+   * @param path The file path to purge from cache. If not provided or set to '*', purges the entire bucket cache.
+   * @param parameters Optional fetch parameters like AbortController signal.
+   */
+  async purgeCache(
+    path: string = '*',
+    parameters?: FetchParameters
+  ): Promise<
+    | {
+        data: { message: string }
+        error: null
+      }
+    | {
+        data: null
+        error: StorageError
+      }
+  > {
+    try {
+      const cleanPath = path === '*' || !path ? '*' : this._removeEmptyFolders(path)
+      const cdnPath = `${this.bucketId}/${cleanPath}`
+      const data = await remove(
+        this.fetch,
+        `${this.url}/cdn/${cdnPath}`,
+        {},
+        { headers: this.headers },
+        parameters
+      )
+      return { data, error: null }
+    } catch (error) {
+      if (isStorageError(error)) {
+        /**
+         * The Storage API returns `{ ok:false, status:404 }` for a purge of a
+         * non-existent object.  In that case we want to expose a stable,
+         * developer-friendly error message that the higher level tests (and
+         * potentially downstream apps) can rely on.
+         */
+        const err = error as StorageError
+        const status = (err as any).statusCode ?? (err as any).status
+
+        if (String(status) === '404') {
+          err.message = 'Object not found'
+        }
+
+        return { data: null, error: err }
+      }
+
+      throw error
+    }
+  }
+
   protected encodeMetadata(metadata: Record<string, any>) {
     return JSON.stringify(metadata)
   }

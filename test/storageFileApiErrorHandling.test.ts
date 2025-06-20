@@ -314,4 +314,45 @@ describe('File API Error Handling', () => {
       mockFn.mockRestore()
     })
   })
+
+  describe('purgeCache', () => {
+    it('handles network errors', async () => {
+      const mockError = new Error('Network failure')
+      global.fetch = jest.fn().mockImplementation(() => Promise.reject(mockError))
+      const storage = new StorageClient(URL, { apikey: KEY })
+
+      const { data, error } = await storage.from(BUCKET_ID).purgeCache('test.png')
+      expect(data).toBeNull()
+      expect(error).not.toBeNull()
+      expect(error?.message).toBe('Network failure')
+    })
+
+    it('wraps non-Response errors as StorageUnknownError', async () => {
+      const nonResponseError = new TypeError('Invalid purge operation')
+      global.fetch = jest.fn().mockImplementation(() => Promise.reject(nonResponseError))
+
+      const storage = new StorageClient(URL, { apikey: KEY })
+
+      const { data, error } = await storage.from(BUCKET_ID).purgeCache('test.png')
+      expect(data).toBeNull()
+      expect(error).toBeInstanceOf(StorageUnknownError)
+      expect(error?.message).toBe('Invalid purge operation')
+    })
+
+    it('throws non-StorageError exceptions', async () => {
+      const storage = new StorageClient(URL, { apikey: KEY })
+
+      const mockFn = jest.spyOn(global, 'fetch').mockImplementationOnce(() => {
+        const error = new Error('Unexpected error in purgeCache')
+        Object.defineProperty(error, 'name', { value: 'CustomError' })
+        throw error
+      })
+
+      await expect(storage.from(BUCKET_ID).purgeCache('test.png')).rejects.toThrow(
+        'Unexpected error in purgeCache'
+      )
+
+      mockFn.mockRestore()
+    })
+  })
 })
