@@ -770,6 +770,45 @@ export default class StorageFileApi {
     }
   }
 
+  /**
+   * Purges the cache for a specific object or entire bucket from the CDN.
+   *
+   * @param path The file path to purge from cache. If not provided or set to '*', purges the entire bucket cache.
+   * @param parameters Optional fetch parameters like AbortController signal.
+   */
+  async purgeCache(
+    path: string = '*',
+    parameters?: FetchParameters
+  ): Promise<
+    | {
+        data: { message: string }
+        error: null
+      }
+    | {
+        data: null
+        error: StorageError
+      }
+  > {
+    try {
+      const cleanPath = path === '*' || !path ? '*' : this._removeEmptyFolders(path)
+      const cdnPath = `${this.bucketId}/${cleanPath}`
+      const data = await remove(
+        this.fetch,
+        `${this.url}/cdn/${cdnPath}`,
+        {},
+        { headers: this.headers },
+        parameters
+      )
+      return { data, error: null }
+    } catch (error) {
+      if (isStorageError(error)) {
+        return { data: null, error }
+      }
+
+      throw error
+    }
+  }
+
   protected encodeMetadata(metadata: Record<string, any>) {
     return JSON.stringify(metadata)
   }

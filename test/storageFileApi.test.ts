@@ -576,6 +576,30 @@ describe('Object API', () => {
       'height:200,width:200,resizing_type:fill,quality:60'
     )
   })
+
+  test('purge cache for specific object', async () => {
+    await storage.from(bucketName).upload(uploadPath, file)
+    const res = await storage.from(bucketName).purgeCache(uploadPath)
+
+    expect(res.error).toBeNull()
+    expect(res.data?.message).toEqual('success')
+  })
+
+  test('purge cache for entire bucket', async () => {
+    await storage.from(bucketName).upload(uploadPath, file)
+    const res = await storage.from(bucketName).purgeCache()
+
+    expect(res.error).toBeNull()
+    expect(res.data?.message).toEqual('success')
+  })
+
+  test('purge cache with wildcard', async () => {
+    await storage.from(bucketName).upload(uploadPath, file)
+    const res = await storage.from(bucketName).purgeCache('*')
+
+    expect(res.error).toBeNull()
+    expect(res.data?.message).toEqual('success')
+  })
 })
 
 describe('error handling', () => {
