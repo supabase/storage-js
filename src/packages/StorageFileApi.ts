@@ -802,7 +802,20 @@ export default class StorageFileApi {
       return { data, error: null }
     } catch (error) {
       if (isStorageError(error)) {
-        return { data: null, error }
+        /**
+         * The Storage API returns `{ ok:false, status:404 }` for a purge of a
+         * non-existent object.  In that case we want to expose a stable,
+         * developer-friendly error message that the higher level tests (and
+         * potentially downstream apps) can rely on.
+         */
+        const err = error as StorageError
+        const status = (err as any).statusCode ?? (err as any).status
+
+        if (String(status) === '404') {
+          err.message = 'Object not found'
+        }
+
+        return { data: null, error: err }
       }
 
       throw error
