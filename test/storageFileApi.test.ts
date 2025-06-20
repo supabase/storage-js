@@ -577,30 +577,117 @@ describe('Object API', () => {
     )
   })
 
-  test.skip('purge cache for specific object', async () => {
-    await storage.from(bucketName).upload(uploadPath, file)
-    const res = await storage.from(bucketName).purgeCache(uploadPath)
+    // Mock-based tests for coverage (until server endpoint is ready)
+    test('purge cache - mock successful response', async () => {
+      const originalFetch = global.fetch
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ message: 'success' })
+      })
 
-    expect(res.error).toBeNull()
-    expect(res.data?.message).toEqual('success')
+      try {
+        const res = await storage.from(bucketName).purgeCache('test-file.jpg')
+        expect(res.error).toBeNull()
+        expect(res.data?.message).toEqual('success')
+        expect(global.fetch).toHaveBeenCalledWith(
+          expect.stringContaining(`/cdn/${bucketName}/test-file.jpg`),
+          expect.objectContaining({
+            method: 'DELETE'
+          })
+        )
+      } finally {
+        global.fetch = originalFetch
+      }
+    })
+
+    test('purge cache - mock entire bucket', async () => {
+      const originalFetch = global.fetch
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ message: 'success' })
+      })
+
+      try {
+        const res = await storage.from(bucketName).purgeCache()
+        expect(res.error).toBeNull()
+        expect(res.data?.message).toEqual('success')
+        expect(global.fetch).toHaveBeenCalledWith(
+          expect.stringContaining(`/cdn/${bucketName}/*`),
+          expect.objectContaining({
+            method: 'DELETE'
+          })
+        )
+      } finally {
+        global.fetch = originalFetch
+      }
+    })
+
+    test('purge cache - mock with path normalization', async () => {
+      const originalFetch = global.fetch
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ message: 'success' })
+      })
+
+      try {
+        const res = await storage.from(bucketName).purgeCache('/folder//file.jpg/')
+        expect(res.error).toBeNull()
+        expect(res.data?.message).toEqual('success')
+        
+        expect(global.fetch).toHaveBeenCalledWith(
+          expect.stringContaining(`/cdn/${bucketName}/folder/file.jpg`),
+          expect.objectContaining({
+            method: 'DELETE'
+          })
+        )
+      } finally {
+        global.fetch = originalFetch
+      }
+    })
+
+    test('purge cache - mock error response', async () => {
+      const originalFetch = global.fetch
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: false,
+        status: 404,
+        json: async () => ({ error: 'Object not found' })
+      })
+
+      try {
+        const res = await storage.from(bucketName).purgeCache('nonexistent.jpg')
+        expect(res.data).toBeNull()
+        expect(res.error).not.toBeNull()
+        expect(res.error?.message).toContain('Object not found')
+      } finally {
+        global.fetch = originalFetch
+      }
+    })
+
+    // Integration tests (skipped until server endpoint is ready)
+    test.skip('purge cache for specific object', async () => {
+      await storage.from(bucketName).upload(uploadPath, file)
+      const res = await storage.from(bucketName).purgeCache(uploadPath)
+
+      expect(res.error).toBeNull()
+      expect(res.data?.message).toEqual('success')
+    })
+
+    test.skip('purge cache for entire bucket', async () => {
+      await storage.from(bucketName).upload(uploadPath, file)
+      const res = await storage.from(bucketName).purgeCache()
+
+      expect(res.error).toBeNull()
+      expect(res.data?.message).toEqual('success')
+    })
+
+    test.skip('purge cache with wildcard', async () => {
+      await storage.from(bucketName).upload(uploadPath, file)
+      const res = await storage.from(bucketName).purgeCache('*')
+
+      expect(res.error).toBeNull()
+      expect(res.data?.message).toEqual('success')
+    })
   })
-
-  test.skip('purge cache for entire bucket', async () => {
-    await storage.from(bucketName).upload(uploadPath, file)
-    const res = await storage.from(bucketName).purgeCache()
-
-    expect(res.error).toBeNull()
-    expect(res.data?.message).toEqual('success')
-  })
-
-  test.skip('purge cache with wildcard', async () => {
-    await storage.from(bucketName).upload(uploadPath, file)
-    const res = await storage.from(bucketName).purgeCache('*')
-
-    expect(res.error).toBeNull()
-    expect(res.data?.message).toEqual('success')
-  })
-})
 
 describe('error handling', () => {
   let mockError: Error
