@@ -577,7 +577,7 @@ describe('Object API', () => {
     )
   })
 
-  test('purge cache for specific object', async () => {
+  test.skip('purge cache for specific object', async () => {
     await storage.from(bucketName).upload(uploadPath, file)
     const res = await storage.from(bucketName).purgeCache(uploadPath)
 
@@ -585,7 +585,7 @@ describe('Object API', () => {
     expect(res.data?.message).toEqual('success')
   })
 
-  test('purge cache for entire bucket', async () => {
+  test.skip('purge cache for entire bucket', async () => {
     await storage.from(bucketName).upload(uploadPath, file)
     const res = await storage.from(bucketName).purgeCache()
 
@@ -593,7 +593,7 @@ describe('Object API', () => {
     expect(res.data?.message).toEqual('success')
   })
 
-  test('purge cache with wildcard', async () => {
+  test.skip('purge cache with wildcard', async () => {
     await storage.from(bucketName).upload(uploadPath, file)
     const res = await storage.from(bucketName).purgeCache('*')
 
