@@ -37,17 +37,17 @@ describe('Bucket API Error Handling', () => {
     const urlTestCases = [
       [
         'https://blah.supabase.co/storage/v1',
-        'https://blah.storage.supabase.co/v1',
+        'https://blah.storage.supabase.co/storage/v1',
         'update legacy prod host to new host',
       ],
       [
         'https://blah.supabase.red/storage/v1',
-        'https://blah.storage.supabase.red/v1',
+        'https://blah.storage.supabase.red/storage/v1',
         'update legacy staging host to new host',
       ],
       [
-        'https://blah.storage.supabase.co/v1',
-        'https://blah.storage.supabase.co/v1',
+        'https://blah.storage.supabase.co/storage/v1',
+        'https://blah.storage.supabase.co/storage/v1',
         'accept new host without modification',
       ],
       [
@@ -63,11 +63,17 @@ describe('Bucket API Error Handling', () => {
     ]
 
     urlTestCases.forEach(([inputUrl, expectUrl, description]) => {
-      it('should ' + description, () => {
+      it('should ' + description + ' if useNewHostname is true', () => {
         const storage = new StorageClient(inputUrl, { apikey: KEY }, undefined, {
           useNewHostname: true,
         })
         expect(storage['url']).toBe(expectUrl)
+      })
+      it('should not modify host if useNewHostname is false', () => {
+        const storage = new StorageClient(inputUrl, { apikey: KEY }, undefined, {
+          useNewHostname: false,
+        })
+        expect(storage['url']).toBe(inputUrl)
       })
     })
   })
