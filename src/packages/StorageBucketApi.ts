@@ -241,9 +241,11 @@ export default class StorageBucketApi {
    * You must first `empty()` the bucket.
    *
    * @param id The unique identifier of the bucket you would like to delete.
+   * @param options.type (optional) The type of the bucket. default is `STANDARD`.
    */
   async deleteBucket(
-    id: string
+    id: string,
+    options?: { type?: BucketType }
   ): Promise<
     | {
         data: { message: string }
@@ -255,12 +257,14 @@ export default class StorageBucketApi {
       }
   > {
     try {
-      const data = await remove(
-        this.fetch,
-        `${this.url}/bucket/${id}`,
-        {},
-        { headers: this.headers }
-      )
+      let baseUrl = `${this.url}/bucket/${id}`
+
+      if (options?.type) {
+        // If type is provided, append it to the URL as a query parameter
+        baseUrl += `?type=${options.type}`
+      }
+
+      const data = await remove(this.fetch, baseUrl, {}, { headers: this.headers })
       return { data, error: null }
     } catch (error) {
       if (isStorageError(error)) {
