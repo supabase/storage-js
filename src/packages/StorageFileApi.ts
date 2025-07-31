@@ -504,7 +504,7 @@ export default class StorageFileApi {
       }
   > {
     const wantsTransformation = typeof options?.transform !== 'undefined'
-    const renderPath = wantsTransformation ? 'render/image/authenticated' : 'object'
+    const renderPath = wantsTransformation ? 'render/image/authenticated' : 'object/authenticated'
     const transformationQuery = this.transformOptsToQueryString(options?.transform || {})
     const queryString = transformationQuery ? `?${transformationQuery}` : ''
 
@@ -544,7 +544,7 @@ export default class StorageFileApi {
     const _path = this._getFinalPath(path)
 
     try {
-      const data = await get(this.fetch, `${this.url}/object/info/${_path}`, {
+      const data = await get(this.fetch, `${this.url}/object/info/authenticated/${_path}`, {
         headers: this.headers,
       })
 
@@ -577,7 +577,7 @@ export default class StorageFileApi {
     const _path = this._getFinalPath(path)
 
     try {
-      await head(this.fetch, `${this.url}/object/${_path}`, {
+      await head(this.fetch, `${this.url}/object/authenticated/${_path}`, {
         headers: this.headers,
       })
 
