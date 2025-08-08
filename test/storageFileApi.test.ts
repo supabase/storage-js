@@ -153,6 +153,17 @@ describe('Object API', () => {
       expect(res.data?.path).toEqual(uploadPath)
     })
 
+    test('uploading stream with duplex option', async () => {
+      const file = await fs.createReadStream(uploadFilePath('file.txt'))
+      const uploadPathWithDuplex = `testpath/file-duplex-${Date.now()}.txt`
+
+      const res = await storage.from(bucketName).upload(uploadPathWithDuplex, file, {
+        duplex: 'half',
+      })
+      expect(res.error).toBeNull()
+      expect(res.data?.path).toEqual(uploadPathWithDuplex)
+    })
+
     test('upload and update file', async () => {
       const file2 = await fsp.readFile(uploadFilePath('file-2.txt'))
 
