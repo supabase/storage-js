@@ -826,7 +826,7 @@ describe('Object API', () => {
             new Response(
               JSON.stringify([
                 { name: 'file1.jpg', id: '1' },
-                { name: 'subfolder/', id: '2' },
+                { name: 'subfolder/', id: null },
                 { name: 'file2.png', id: '3' },
               ]),
               { status: 200 }
