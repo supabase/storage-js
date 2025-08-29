@@ -574,8 +574,8 @@ describe('File API Error Handling', () => {
     it('handles list response with only folders', async () => {
       const listResponse = new Response(
         JSON.stringify([
-          { name: 'subfolder1/', id: '1' },
-          { name: 'subfolder2/', id: '2' },
+          { name: 'subfolder1/', id: null },
+          { name: 'subfolder2/', id: null },
         ]),
         {
           status: 200,
@@ -665,7 +665,7 @@ describe('File API Error Handling', () => {
 
       const { data, error } = await storage
         .from(BUCKET_ID)
-        .purgeCacheByPrefix('folder', undefined, { signal: abortController.signal })
+        .purgeCacheByPrefix('folder', { batchDelayMs: 10 }, { signal: abortController.signal })
       expect(error).toBeNull()
       expect(data?.purgedPaths).toHaveLength(1)
       expect(data?.purgedPaths).toEqual(['folder/file1.jpg'])

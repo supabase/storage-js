@@ -896,8 +896,8 @@ describe('Object API', () => {
       // Mock list response with only folders
       const listResponse = new Response(
         JSON.stringify([
-          { name: 'subfolder1/', id: '1' },
-          { name: 'subfolder2/', id: '2' },
+          { name: 'subfolder1/', id: null },
+          { name: 'subfolder2/', id: null },
         ]),
         {
           status: 200,
@@ -941,6 +941,40 @@ describe('Object API', () => {
       expect(res.error).toBeNull()
       expect(res.data?.purgedPaths).toHaveLength(150)
       expect(res.data?.message).toContain('Successfully purged 150 object(s)')
+    })
+
+    test('purge cache by prefix - with batch delay', async () => {
+      const fileCount = 6
+      const files = Array.from({ length: fileCount }, (_, i) => ({
+        name: `file${i}.jpg`,
+        id: String(i),
+      }))
+
+      let fetchCallCount = 0
+      const startTime = Date.now()
+      global.fetch = jest.fn().mockImplementation(() => {
+        fetchCallCount++
+        if (fetchCallCount === 1) {
+          return Promise.resolve(new Response(JSON.stringify(files), { status: 200 }))
+        }
+        return Promise.resolve(
+          new Response(JSON.stringify({ message: 'success' }), { status: 200 })
+        )
+      })
+
+      const mockStorage = new StorageClient(URL, { Authorization: `Bearer ${KEY}` })
+      const res = await mockStorage
+        .from(bucketName)
+        .purgeCacheByPrefix('folder', { batchSize: 2, batchDelayMs: 50 })
+
+      const endTime = Date.now()
+      const executionTime = endTime - startTime
+
+      expect(res.error).toBeNull()
+      expect(res.data?.purgedPaths).toHaveLength(6)
+      expect(res.data?.message).toContain('Successfully purged 6 object(s)')
+      // Should have delays between batches (3 batches = 2 delays = ~100ms minimum)
+      expect(executionTime).toBeGreaterThanOrEqual(100)
     })
 
     test('purge cache by prefix - list error', async () => {

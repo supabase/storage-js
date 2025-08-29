@@ -843,8 +843,15 @@ export default class StorageFileApi {
    * Purges the cache for all objects in a folder or entire bucket.
    * This method lists objects first, then purges each individually.
    *
+   * Note: This operation can take a very long time for large numbers of objects.
+   * Each object purge takes between 300ms and 600ms, so purging 200+ objects
+   * could take several minutes.
+   *
    * @param prefix The folder prefix to purge (empty string for entire bucket)
    * @param options Optional configuration for listing and purging
+   * @param options.limit Maximum number of objects to list (default: 1000)
+   * @param options.batchSize Number of objects to process in each batch (default: 100)
+   * @param options.batchDelayMs Delay in milliseconds between batches (default: 0)
    * @param parameters Optional fetch parameters
    */
   async purgeCacheByPrefix(
@@ -852,6 +859,7 @@ export default class StorageFileApi {
     options?: {
       limit?: number
       batchSize?: number
+      batchDelayMs?: number
     },
     parameters?: FetchParameters
   ): Promise<
@@ -866,6 +874,7 @@ export default class StorageFileApi {
   > {
     try {
       const batchSize = options?.batchSize || 100
+      const batchDelayMs = options?.batchDelayMs || 0
       const purgedPaths: string[] = []
       const warnings: string[] = []
 
@@ -893,9 +902,9 @@ export default class StorageFileApi {
         }
       }
 
-      // Extract file paths and filter out folders
+      // Extract file paths and filter out folders (folders have id === null)
       const filePaths = objects
-        .filter((obj) => obj.name && !obj.name.endsWith('/')) // Only files, not folders
+        .filter((obj) => obj.id !== null) // Only files, not folders
         .map((obj) => (prefix ? `${prefix}/${obj.name}` : obj.name))
 
       if (filePaths.length === 0) {
@@ -924,6 +933,11 @@ export default class StorageFileApi {
           } catch (error) {
             warnings.push(`Failed to purge ${filePath}: ${(error as Error).message}`)
           }
+        }
+
+        // Add delay between batches if specified and not the last batch
+        if (batchDelayMs > 0 && i + batchSize < filePaths.length) {
+          await new Promise((resolve) => setTimeout(resolve, batchDelayMs))
         }
       }
 
