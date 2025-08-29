@@ -771,6 +771,43 @@ export default class StorageFileApi {
   }
 
   /**
+   * @experimental this method signature might change in the future
+   * @param options search options
+   * @param parameters
+   */
+  async listV2(
+    options?: any,
+    parameters?: FetchParameters
+  ): Promise<
+    | {
+        data: any
+        error: null
+      }
+    | {
+        data: null
+        error: StorageError
+      }
+  > {
+    try {
+      const body = { ...options }
+      const data = await post(
+        this.fetch,
+        `${this.url}/object/list-v2/${this.bucketId}`,
+        body,
+        { headers: this.headers },
+        parameters
+      )
+      return { data, error: null }
+    } catch (error) {
+      if (isStorageError(error)) {
+        return { data: null, error }
+      }
+
+      throw error
+    }
+  }
+
+  /**
    * Purges the cache for a specific object from the CDN.
    * Note: This method only works with individual file paths.
    * Use purgeCacheByPrefix() to purge multiple objects or entire folders.
@@ -993,7 +1030,7 @@ export default class StorageFileApi {
   }
 
   private _getFinalPath(path: string) {
-    return `${this.bucketId}/${path}`
+    return `${this.bucketId}/${path.replace(/^\/+/, '')}`
   }
 
   private _removeEmptyFolders(path: string) {
