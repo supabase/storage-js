@@ -33,7 +33,60 @@ describe('Bucket API Error Handling', () => {
     jest.restoreAllMocks()
   })
 
+  describe('URL Construction', () => {
+    const urlTestCases = [
+      [
+        'https://blah.supabase.co/storage/v1',
+        'https://blah.storage.supabase.co/storage/v1',
+        'update legacy prod host to new host',
+      ],
+      [
+        'https://blah.supabase.red/storage/v1',
+        'https://blah.storage.supabase.red/storage/v1',
+        'update legacy staging host to new host',
+      ],
+      [
+        'https://blah.storage.supabase.co/storage/v1',
+        'https://blah.storage.supabase.co/storage/v1',
+        'accept new host without modification',
+      ],
+      [
+        'https://blah.supabase.co.example.com/storage/v1',
+        'https://blah.supabase.co.example.com/storage/v1',
+        'not modify non-platform hosts',
+      ],
+      [
+        'http://localhost:1234/storage/v1',
+        'http://localhost:1234/storage/v1',
+        'support local host with port without modification',
+      ],
+    ]
+
+    urlTestCases.forEach(([inputUrl, expectUrl, description]) => {
+      it('should ' + description + ' if useNewHostname is true', () => {
+        const storage = new StorageClient(inputUrl, { apikey: KEY }, undefined, {
+          useNewHostname: true,
+        })
+        expect(storage['url']).toBe(expectUrl)
+      })
+      it('should not modify host if useNewHostname is false', () => {
+        const storage = new StorageClient(inputUrl, { apikey: KEY }, undefined, {
+          useNewHostname: false,
+        })
+        expect(storage['url']).toBe(inputUrl)
+      })
+    })
+  })
+
   describe('listBuckets', () => {
+    it('handles missing authorization errors if header is not provided', async () => {
+      const storage = new StorageClient(URL)
+      const { data, error } = await storage.listBuckets()
+      expect(data).toBeNull()
+      expect(error).not.toBeNull()
+      expect(error?.message).toBe(`headers must have required property 'authorization'`)
+    })
+
     it('handles network errors', async () => {
       const mockError = new Error('Network failure')
       global.fetch = jest.fn().mockImplementation(() => Promise.reject(mockError))

@@ -2,15 +2,32 @@ import { DEFAULT_HEADERS } from '../lib/constants'
 import { isStorageError, StorageError } from '../lib/errors'
 import { Fetch, get, post, put, remove } from '../lib/fetch'
 import { resolveFetch } from '../lib/helpers'
-import { Bucket } from '../lib/types'
+import { Bucket, BucketType } from '../lib/types'
+import { StorageClientOptions } from '../StorageClient'
 
 export default class StorageBucketApi {
   protected url: string
   protected headers: { [key: string]: string }
   protected fetch: Fetch
 
-  constructor(url: string, headers: { [key: string]: string } = {}, fetch?: Fetch) {
-    this.url = url
+  constructor(
+    url: string,
+    headers: { [key: string]: string } = {},
+    fetch?: Fetch,
+    opts?: StorageClientOptions
+  ) {
+    const baseUrl = new URL(url)
+
+    // if legacy uri is used, replace with new storage host (disables request buffering to allow > 50GB uploads)
+    // "project-ref.supabase.co" becomes "project-ref.storage.supabase.co"
+    if (opts?.useNewHostname) {
+      const isSupabaseHost = /supabase\.(co|in|red)$/.test(baseUrl.hostname)
+      if (isSupabaseHost && !baseUrl.hostname.includes('storage.supabase.')) {
+        baseUrl.hostname = baseUrl.hostname.replace('supabase.', 'storage.supabase.')
+      }
+    }
+
+    this.url = baseUrl.href
     this.headers = { ...DEFAULT_HEADERS, ...headers }
     this.fetch = resolveFetch(fetch)
   }
@@ -81,6 +98,8 @@ export default class StorageBucketApi {
    * The default value is null, which allows files with all mime types to be uploaded.
    * Each mime type specified can be a wildcard, e.g. image/*, or a specific mime type, e.g. image/png.
    * @returns newly created bucket id
+   * @param options.type (private-beta) specifies the bucket type. see `BucketType` for more details.
+   *   - default bucket type is `STANDARD`
    */
   async createBucket(
     id: string,
@@ -88,6 +107,7 @@ export default class StorageBucketApi {
       public: boolean
       fileSizeLimit?: number | string | null
       allowedMimeTypes?: string[] | null
+      type?: BucketType
     } = {
       public: false,
     }
@@ -108,6 +128,7 @@ export default class StorageBucketApi {
         {
           id,
           name: id,
+          type: options.type,
           public: options.public,
           file_size_limit: options.fileSizeLimit,
           allowed_mime_types: options.allowedMimeTypes,

@@ -10,6 +10,8 @@ import {
   DestinationOptions,
   FileObjectV2,
   Camelize,
+  SearchV2Options,
+  SearchV2Result,
 } from '../lib/types'
 
 const DEFAULT_SEARCH_OPTIONS = {
@@ -736,6 +738,7 @@ export default class StorageFileApi {
   /**
    * Lists all the files within a bucket.
    * @param path The folder path.
+   * @param options Search options including limit (defaults to 100), offset, sortBy, and search
    */
   async list(
     path?: string,
@@ -776,11 +779,11 @@ export default class StorageFileApi {
    * @param parameters
    */
   async listV2(
-    options?: any,
+    options?: SearchV2Options,
     parameters?: FetchParameters
   ): Promise<
     | {
-        data: any
+        data: SearchV2Result
         error: null
       }
     | {

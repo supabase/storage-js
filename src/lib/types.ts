@@ -1,5 +1,8 @@
+export type BucketType = 'STANDARD' | 'ANALYTICS'
+
 export interface Bucket {
   id: string
+  type?: BucketType
   name: string
   owner: string
   file_size_limit?: number
@@ -77,7 +80,8 @@ export interface DestinationOptions {
 
 export interface SearchOptions {
   /**
-   *  The number of files you want to be returned.
+   * The number of files you want to be returned.
+   * @default 100
    */
   limit?: number
 
@@ -95,6 +99,19 @@ export interface SearchOptions {
    * The search string to filter files by.
    */
   search?: string
+}
+
+export interface SearchV2Options {
+  limit?: number
+  prefix?: string
+  cursor?: string
+  with_delimiter?: boolean
+}
+
+export interface SearchV2Result {
+  hasNext: boolean
+  folders: { name: string }[]
+  objects: FileObject[]
 }
 
 export interface FetchParameters {
