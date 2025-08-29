@@ -96,6 +96,16 @@ export interface SearchOptions {
   sortBy?: SortBy
 
   /**
+   * The column to sort by (flat format). Alternative to sortBy.column.
+   */
+  sort_by?: string
+
+  /**
+   * The sort order (flat format). Alternative to sortBy.order.
+   */
+  sort_order?: 'asc' | 'desc'
+
+  /**
    * The search string to filter files by.
    */
   search?: string
