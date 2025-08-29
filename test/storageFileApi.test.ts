@@ -6,13 +6,9 @@ import assert from 'assert'
 // @ts-ignore
 import fetch, { Response } from '@supabase/node-fetch'
 import { StorageApiError, StorageError } from '../src/lib/errors'
+import { createJWTStorageClient, createStorageClient, STORAGE_URL, JWT_KEY } from './config'
 
-// TODO: need to setup storage-api server for this test
-const URL = 'http://localhost:8000/storage/v1'
-const KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYXV0aGVudGljYXRlZCIsInN1YiI6IjMxN2VhZGNlLTYzMWEtNDQyOS1hMGJiLWYxOWE3YTUxN2I0YSIsImlhdCI6MTcxMzQzMzgwMCwiZXhwIjoyMDI5MDA5ODAwfQ.jVFIR-MB7rNfUuJaUH-_CyDFZEHezzXiqcRcdrGd29o'
-
-const storage = new StorageClient(URL, { Authorization: `Bearer ${KEY}` })
+const storage = createJWTStorageClient()
 
 const newBucket = async (isPublic = true, prefix = '') => {
   const bucketName = `${prefix ? prefix + '-' : ''}bucket-${Date.now()}`
@@ -46,7 +42,7 @@ describe('Object API', () => {
   describe('Generate urls', () => {
     test('get public URL', async () => {
       const res = storage.from(bucketName).getPublicUrl(uploadPath)
-      expect(res.data.publicUrl).toEqual(`${URL}/object/public/${bucketName}/${uploadPath}`)
+      expect(res.data.publicUrl).toEqual(`${STORAGE_URL}/object/public/${bucketName}/${uploadPath}`)
     })
 
     test('get public URL with download querystring', async () => {
@@ -54,7 +50,7 @@ describe('Object API', () => {
         download: true,
       })
       expect(res.data.publicUrl).toEqual(
-        `${URL}/object/public/${bucketName}/${uploadPath}?download=`
+        `${STORAGE_URL}/object/public/${bucketName}/${uploadPath}?download=`
       )
     })
 
@@ -63,7 +59,7 @@ describe('Object API', () => {
         download: 'test.jpg',
       })
       expect(res.data.publicUrl).toEqual(
-        `${URL}/object/public/${bucketName}/${uploadPath}?download=test.jpg`
+        `${STORAGE_URL}/object/public/${bucketName}/${uploadPath}?download=test.jpg`
       )
     })
 
@@ -74,7 +70,9 @@ describe('Object API', () => {
       const res = await storage.from(bucketName).createSignedUrl(uploadPath, 2000)
 
       expect(res.error).toBeNull()
-      expect(res.data?.signedUrl).toContain(`${URL}/object/sign/${bucketName}/${uploadPath}`)
+      expect(res.data?.signedUrl).toContain(
+        `${STORAGE_URL}/object/sign/${bucketName}/${uploadPath}`
+      )
     })
 
     test('sign url with download querystring parameter', async () => {
@@ -84,7 +82,9 @@ describe('Object API', () => {
       })
 
       expect(res.error).toBeNull()
-      expect(res.data?.signedUrl).toContain(`${URL}/object/sign/${bucketName}/${uploadPath}`)
+      expect(res.data?.signedUrl).toContain(
+        `${STORAGE_URL}/object/sign/${bucketName}/${uploadPath}`
+      )
       expect(res.data?.signedUrl).toContain(`&download=`)
     })
 
@@ -99,7 +99,9 @@ describe('Object API', () => {
       })
 
       expect(res.error).toBeNull()
-      expect(res.data?.signedUrl).toContain(`${URL}/render/image/sign/${bucketName}/${uploadPath}`)
+      expect(res.data?.signedUrl).toContain(
+        `${STORAGE_URL}/render/image/sign/${bucketName}/${uploadPath}`
+      )
     })
 
     test('sign url with custom filename for download', async () => {
@@ -109,7 +111,9 @@ describe('Object API', () => {
       })
 
       expect(res.error).toBeNull()
-      expect(res.data?.signedUrl).toContain(`${URL}/object/sign/${bucketName}/${uploadPath}`)
+      expect(res.data?.signedUrl).toContain(
+        `${STORAGE_URL}/object/sign/${bucketName}/${uploadPath}`
+      )
       expect(res.data?.signedUrl).toContain(`&download=test.jpg`)
     })
   })
@@ -243,7 +247,9 @@ describe('Object API', () => {
       expect(res.error).toBeNull()
       expect(res.data?.path).toBe(uploadPath)
       expect(res.data?.token).toBeDefined()
-      expect(res.data?.signedUrl).toContain(`${URL}/object/upload/sign/${bucketName}/${uploadPath}`)
+      expect(res.data?.signedUrl).toContain(
+        `${STORAGE_URL}/object/upload/sign/${bucketName}/${uploadPath}`
+      )
     })
 
     test('can upload with a signed url', async () => {
@@ -333,6 +339,57 @@ describe('Object API', () => {
       )
     })
 
+    test('list objects with flat sort_by and sort_order', async () => {
+      await storage.from(bucketName).upload(uploadPath, file)
+      const res = await storage.from(bucketName).list('testpath', {
+        sort_by: 'name',
+        sort_order: 'desc',
+      })
+
+      expect(res.error).toBeNull()
+      expect(res.data).toEqual([
+        expect.objectContaining({
+          name: uploadPath.replace('testpath/', ''),
+        }),
+      ])
+    })
+
+    test('list objects with sortBy format still works', async () => {
+      await storage.from(bucketName).upload(uploadPath, file)
+      const res = await storage.from(bucketName).list('testpath', {
+        sortBy: {
+          column: 'name',
+          order: 'asc',
+        },
+      })
+
+      expect(res.error).toBeNull()
+      expect(res.data).toEqual([
+        expect.objectContaining({
+          name: uploadPath.replace('testpath/', ''),
+        }),
+      ])
+    })
+
+    test('list objects prioritizes flat format over nested format', async () => {
+      await storage.from(bucketName).upload(uploadPath, file)
+      const res = await storage.from(bucketName).list('testpath', {
+        sort_by: 'created_at',
+        sort_order: 'desc',
+        sortBy: {
+          column: 'name',
+          order: 'asc',
+        },
+      })
+
+      expect(res.error).toBeNull()
+      expect(res.data).toEqual([
+        expect.objectContaining({
+          name: uploadPath.replace('testpath/', ''),
+        }),
+      ])
+    })
+
     test('move object to different path', async () => {
       const newPath = `testpath/file-moved-${Date.now()}.txt`
       await storage.from(bucketName).upload(uploadPath, file)
@@ -346,7 +403,6 @@ describe('Object API', () => {
       const newBucketName = 'bucket-move'
 
       const newPath = `testpath/file-to-move-${Date.now()}.txt`
-      const upload = await storage.from(bucketName).upload(uploadPath, file)
 
       const res = await storage.from(bucketName).move(uploadPath, newPath, {
         destinationBucket: newBucketName,
@@ -445,7 +501,7 @@ describe('Object API', () => {
         },
       })
       expect(res.data.publicUrl).toEqual(
-        `${URL}/render/image/public/${bucketName}/${uploadPath}?width=200&height=300&quality=70`
+        `${STORAGE_URL}/render/image/public/${bucketName}/${uploadPath}?width=200&height=300&quality=70`
       )
     })
 
@@ -470,7 +526,10 @@ describe('Object API', () => {
   })
 
   it.skip('will return the image as webp when the browser support it', async () => {
-    const storage = new StorageClient(URL, { Authorization: `Bearer ${KEY}`, Accept: 'image/webp' })
+    const storage = new StorageClient(STORAGE_URL, {
+      Authorization: `Bearer ${JWT_KEY}`,
+      Accept: 'image/webp',
+    })
     const privateBucketName = 'my-private-bucket'
     await findOrCreateBucket(privateBucketName)
 
@@ -490,7 +549,10 @@ describe('Object API', () => {
   })
 
   it.skip('will return the original image format when format is origin', async () => {
-    const storage = new StorageClient(URL, { Authorization: `Bearer ${KEY}`, Accept: 'image/webp' })
+    const storage = new StorageClient(STORAGE_URL, {
+      Authorization: `Bearer ${JWT_KEY}`,
+      Accept: 'image/webp',
+    })
     const privateBucketName = 'my-private-bucket'
     await findOrCreateBucket(privateBucketName)
 
@@ -546,9 +608,7 @@ describe('error handling', () => {
 
   it('throws unknown errors', async () => {
     global.fetch = jest.fn().mockImplementation(() => Promise.reject(mockError))
-    const storage = new StorageClient('http://localhost:8000/storage/v1', {
-      apikey: 'test-token',
-    })
+    const storage = createStorageClient({ apikey: 'test-token' })
 
     const { data, error } = await storage.from('test').list()
     expect(data).toBeNull()
@@ -563,9 +623,7 @@ describe('error handling', () => {
     })
 
     global.fetch = jest.fn().mockImplementation(() => Promise.resolve(mockResponse))
-    const storage = new StorageClient('http://localhost:8000/storage/v1', {
-      apikey: 'test-token',
-    })
+    const storage = createStorageClient({ apikey: 'test-token' })
 
     const { data, error } = await storage.from('test').list()
     expect(data).toBeNull()
@@ -576,9 +634,7 @@ describe('error handling', () => {
   it('handles network timeouts', async () => {
     mockError = new Error('Network timeout')
     global.fetch = jest.fn().mockImplementation(() => Promise.reject(mockError))
-    const storage = new StorageClient('http://localhost:8000/storage/v1', {
-      apikey: 'test-token',
-    })
+    const storage = createStorageClient({ apikey: 'test-token' })
 
     const { data, error } = await storage.from('test').list()
     expect(data).toBeNull()
@@ -591,9 +647,7 @@ describe('StorageFileApi Edge Cases', () => {
   let storage: StorageClient
 
   beforeEach(() => {
-    storage = new StorageClient('http://localhost:8000/storage/v1', {
-      apikey: 'test-token',
-    })
+    storage = createStorageClient({ apikey: 'test-token' })
   })
 
   describe('Public URL with transformations', () => {
