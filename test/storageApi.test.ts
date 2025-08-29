@@ -1,11 +1,6 @@
-import { StorageClient } from '../src/index'
+import { createJWTStorageClient } from './config'
 
-// TODO: need to setup storage-api server for this test
-const URL = 'http://localhost:8000/storage/v1'
-const KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYXV0aGVudGljYXRlZCIsInN1YiI6IjMxN2VhZGNlLTYzMWEtNDQyOS1hMGJiLWYxOWE3YTUxN2I0YSIsImlhdCI6MTcxMzQzMzgwMCwiZXhwIjoyMDI5MDA5ODAwfQ.jVFIR-MB7rNfUuJaUH-_CyDFZEHezzXiqcRcdrGd29o'
-
-const storage = new StorageClient(URL, { Authorization: `Bearer ${KEY}` })
+const storage = createJWTStorageClient()
 const newBucketName = `my-new-bucket-${Date.now()}`
 
 describe('bucket api', () => {
