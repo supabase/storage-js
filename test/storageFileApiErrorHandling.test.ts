@@ -1,9 +1,6 @@
-import { StorageClient } from '../src/index'
-import { StorageError, StorageUnknownError } from '../src/lib/errors'
+import { StorageUnknownError } from '../src/lib/errors'
+import { createTestStorageClient } from './config'
 
-// Mock URL and credentials for testing
-const URL = 'http://localhost:8000/storage/v1'
-const KEY = 'test-api-key'
 const BUCKET_ID = 'test-bucket'
 
 describe('File API Error Handling', () => {
@@ -23,7 +20,7 @@ describe('File API Error Handling', () => {
     it('handles network errors', async () => {
       const mockError = new Error('Network failure')
       global.fetch = jest.fn().mockImplementation(() => Promise.reject(mockError))
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       const { data, error } = await storage.from(BUCKET_ID).download('test.jpg')
       expect(data).toBeNull()
@@ -35,7 +32,7 @@ describe('File API Error Handling', () => {
       const nonResponseError = new TypeError('Invalid download format')
       global.fetch = jest.fn().mockImplementation(() => Promise.reject(nonResponseError))
 
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       const { data, error } = await storage.from(BUCKET_ID).download('test.jpg')
       expect(data).toBeNull()
@@ -45,7 +42,7 @@ describe('File API Error Handling', () => {
 
     it('throws non-StorageError exceptions', async () => {
       // Create a storage client
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       // Create a spy on the fetch method that will throw a non-StorageError
       const mockFn = jest.spyOn(global, 'fetch').mockImplementationOnce(() => {
@@ -66,7 +63,7 @@ describe('File API Error Handling', () => {
     it('handles network errors', async () => {
       const mockError = new Error('Network failure')
       global.fetch = jest.fn().mockImplementation(() => Promise.reject(mockError))
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       const { data, error } = await storage.from(BUCKET_ID).list()
       expect(data).toBeNull()
@@ -78,7 +75,7 @@ describe('File API Error Handling', () => {
       const nonResponseError = new TypeError('Invalid list operation')
       global.fetch = jest.fn().mockImplementation(() => Promise.reject(nonResponseError))
 
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       const { data, error } = await storage.from(BUCKET_ID).list()
       expect(data).toBeNull()
@@ -87,7 +84,7 @@ describe('File API Error Handling', () => {
     })
 
     it('throws non-StorageError exceptions', async () => {
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       // Mock the fetch directly instead of the get function
       const mockFn = jest.spyOn(global, 'fetch').mockImplementationOnce(() => {
@@ -106,7 +103,7 @@ describe('File API Error Handling', () => {
     it('handles network errors', async () => {
       const mockError = new Error('Network failure')
       global.fetch = jest.fn().mockImplementation(() => Promise.reject(mockError))
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       const { data, error } = await storage.from(BUCKET_ID).move('source.jpg', 'destination.jpg')
       expect(data).toBeNull()
@@ -118,7 +115,7 @@ describe('File API Error Handling', () => {
       const nonResponseError = new TypeError('Invalid move operation')
       global.fetch = jest.fn().mockImplementation(() => Promise.reject(nonResponseError))
 
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       const { data, error } = await storage.from(BUCKET_ID).move('source.jpg', 'destination.jpg')
       expect(data).toBeNull()
@@ -127,7 +124,7 @@ describe('File API Error Handling', () => {
     })
 
     it('throws non-StorageError exceptions', async () => {
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       const mockFn = jest.spyOn(global, 'fetch').mockImplementationOnce(() => {
         const error = new Error('Unexpected error in move')
@@ -147,7 +144,7 @@ describe('File API Error Handling', () => {
     it('handles network errors', async () => {
       const mockError = new Error('Network failure')
       global.fetch = jest.fn().mockImplementation(() => Promise.reject(mockError))
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       const { data, error } = await storage.from(BUCKET_ID).copy('source.jpg', 'destination.jpg')
       expect(data).toBeNull()
@@ -159,7 +156,7 @@ describe('File API Error Handling', () => {
       const nonResponseError = new TypeError('Invalid copy operation')
       global.fetch = jest.fn().mockImplementation(() => Promise.reject(nonResponseError))
 
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       const { data, error } = await storage.from(BUCKET_ID).copy('source.jpg', 'destination.jpg')
       expect(data).toBeNull()
@@ -168,7 +165,7 @@ describe('File API Error Handling', () => {
     })
 
     it('throws non-StorageError exceptions', async () => {
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       const mockFn = jest.spyOn(global, 'fetch').mockImplementationOnce(() => {
         const error = new Error('Unexpected error in copy')
@@ -188,7 +185,7 @@ describe('File API Error Handling', () => {
     it('handles network errors', async () => {
       const mockError = new Error('Network failure')
       global.fetch = jest.fn().mockImplementation(() => Promise.reject(mockError))
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       const { data, error } = await storage.from(BUCKET_ID).remove(['test.jpg'])
       expect(data).toBeNull()
@@ -200,7 +197,7 @@ describe('File API Error Handling', () => {
       const nonResponseError = new TypeError('Invalid remove operation')
       global.fetch = jest.fn().mockImplementation(() => Promise.reject(nonResponseError))
 
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       const { data, error } = await storage.from(BUCKET_ID).remove(['test.jpg'])
       expect(data).toBeNull()
@@ -209,7 +206,7 @@ describe('File API Error Handling', () => {
     })
 
     it('throws non-StorageError exceptions', async () => {
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       const mockFn = jest.spyOn(global, 'fetch').mockImplementationOnce(() => {
         const error = new Error('Unexpected error in remove')
@@ -229,7 +226,7 @@ describe('File API Error Handling', () => {
     it('handles network errors', async () => {
       const mockError = new Error('Network failure')
       global.fetch = jest.fn().mockImplementation(() => Promise.reject(mockError))
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       const { data, error } = await storage.from(BUCKET_ID).createSignedUrl('test.jpg', 60)
       expect(data).toBeNull()
@@ -241,7 +238,7 @@ describe('File API Error Handling', () => {
       const nonResponseError = new TypeError('Invalid signature operation')
       global.fetch = jest.fn().mockImplementation(() => Promise.reject(nonResponseError))
 
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       const { data, error } = await storage.from(BUCKET_ID).createSignedUrl('test.jpg', 60)
       expect(data).toBeNull()
@@ -250,7 +247,7 @@ describe('File API Error Handling', () => {
     })
 
     it('throws non-StorageError exceptions', async () => {
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       const mockFn = jest.spyOn(global, 'fetch').mockImplementationOnce(() => {
         const error = new Error('Unexpected error in createSignedUrl')

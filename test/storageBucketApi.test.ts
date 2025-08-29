@@ -1,28 +1,6 @@
 import { StorageClient } from '../src/index'
-import { StorageError, StorageUnknownError } from '../src/lib/errors'
-
-// Create a simple Response implementation for testing
-class MockResponse {
-  ok: boolean
-  status: number
-  statusText: string
-  private body: string
-
-  constructor(body: string, options: { status: number; statusText: string }) {
-    this.body = body
-    this.status = options.status
-    this.statusText = options.statusText
-    this.ok = this.status >= 200 && this.status < 300
-  }
-
-  json() {
-    return Promise.resolve(JSON.parse(this.body))
-  }
-}
-
-// Mock URL and credentials for testing
-const URL = 'http://localhost:8000/storage/v1'
-const KEY = 'test-api-key'
+import { StorageUnknownError } from '../src/lib/errors'
+import { STORAGE_URL, createTestStorageClient, TEST_KEY } from './config'
 
 describe('Bucket API Error Handling', () => {
   beforeEach(() => {
@@ -64,13 +42,13 @@ describe('Bucket API Error Handling', () => {
 
     urlTestCases.forEach(([inputUrl, expectUrl, description]) => {
       it('should ' + description + ' if useNewHostname is true', () => {
-        const storage = new StorageClient(inputUrl, { apikey: KEY }, undefined, {
+        const storage = new StorageClient(inputUrl, { apikey: TEST_KEY }, undefined, {
           useNewHostname: true,
         })
         expect(storage['url']).toBe(expectUrl)
       })
       it('should not modify host if useNewHostname is false', () => {
-        const storage = new StorageClient(inputUrl, { apikey: KEY }, undefined, {
+        const storage = new StorageClient(inputUrl, { apikey: TEST_KEY }, undefined, {
           useNewHostname: false,
         })
         expect(storage['url']).toBe(inputUrl)
@@ -80,7 +58,7 @@ describe('Bucket API Error Handling', () => {
 
   describe('listBuckets', () => {
     it('handles missing authorization errors if header is not provided', async () => {
-      const storage = new StorageClient(URL)
+      const storage = new StorageClient(STORAGE_URL)
       const { data, error } = await storage.listBuckets()
       expect(data).toBeNull()
       expect(error).not.toBeNull()
@@ -90,7 +68,7 @@ describe('Bucket API Error Handling', () => {
     it('handles network errors', async () => {
       const mockError = new Error('Network failure')
       global.fetch = jest.fn().mockImplementation(() => Promise.reject(mockError))
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       const { data, error } = await storage.listBuckets()
       expect(data).toBeNull()
@@ -103,7 +81,7 @@ describe('Bucket API Error Handling', () => {
       const nonResponseError = new TypeError('Invalid argument')
       global.fetch = jest.fn().mockImplementation(() => Promise.reject(nonResponseError))
 
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       // Check that the error is wrapped in a StorageUnknownError
       const { data, error } = await storage.listBuckets()
@@ -114,7 +92,7 @@ describe('Bucket API Error Handling', () => {
 
     it('throws non-StorageError exceptions', async () => {
       // Create a storage client
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       // Create a spy on the get method that will throw a non-StorageError
       const mockFn = jest.spyOn(require('../src/lib/fetch'), 'get').mockImplementationOnce(() => {
@@ -136,7 +114,7 @@ describe('Bucket API Error Handling', () => {
     it('handles network errors', async () => {
       const mockError = new Error('Network failure')
       global.fetch = jest.fn().mockImplementation(() => Promise.reject(mockError))
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       const { data, error } = await storage.getBucket('non-existent-bucket')
       expect(data).toBeNull()
@@ -148,7 +126,7 @@ describe('Bucket API Error Handling', () => {
       const nonResponseError = new TypeError('Invalid bucket format')
       global.fetch = jest.fn().mockImplementation(() => Promise.reject(nonResponseError))
 
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       const { data, error } = await storage.getBucket('test-bucket')
       expect(data).toBeNull()
@@ -158,7 +136,7 @@ describe('Bucket API Error Handling', () => {
 
     it('throws non-StorageError exceptions', async () => {
       // Create a storage client
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       // Create a spy on the get method that will throw a non-StorageError
       const mockFn = jest.spyOn(require('../src/lib/fetch'), 'get').mockImplementationOnce(() => {
@@ -182,7 +160,7 @@ describe('Bucket API Error Handling', () => {
     it('handles network errors', async () => {
       const mockError = new Error('Network failure')
       global.fetch = jest.fn().mockImplementation(() => Promise.reject(mockError))
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       const { data, error } = await storage.createBucket('new-bucket')
       expect(data).toBeNull()
@@ -194,7 +172,7 @@ describe('Bucket API Error Handling', () => {
       const nonResponseError = new TypeError('Invalid bucket configuration')
       global.fetch = jest.fn().mockImplementation(() => Promise.reject(nonResponseError))
 
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       const { data, error } = await storage.createBucket('test-bucket')
       expect(data).toBeNull()
@@ -204,7 +182,7 @@ describe('Bucket API Error Handling', () => {
 
     it('throws non-StorageError exceptions', async () => {
       // Create a storage client
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       // Create a spy on the post method that will throw a non-StorageError
       const mockFn = jest.spyOn(require('../src/lib/fetch'), 'post').mockImplementationOnce(() => {
@@ -228,7 +206,7 @@ describe('Bucket API Error Handling', () => {
     it('handles network errors', async () => {
       const mockError = new Error('Network failure')
       global.fetch = jest.fn().mockImplementation(() => Promise.reject(mockError))
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       const { data, error } = await storage.updateBucket('existing-bucket', { public: true })
       expect(data).toBeNull()
@@ -240,7 +218,7 @@ describe('Bucket API Error Handling', () => {
       const nonResponseError = new TypeError('Invalid update options')
       global.fetch = jest.fn().mockImplementation(() => Promise.reject(nonResponseError))
 
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       const { data, error } = await storage.updateBucket('test-bucket', { public: true })
       expect(data).toBeNull()
@@ -250,7 +228,7 @@ describe('Bucket API Error Handling', () => {
 
     it('throws non-StorageError exceptions', async () => {
       // Create a storage client
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       // Create a spy on the put method that will throw a non-StorageError
       const mockFn = jest.spyOn(require('../src/lib/fetch'), 'put').mockImplementationOnce(() => {
@@ -274,7 +252,7 @@ describe('Bucket API Error Handling', () => {
     it('handles network errors', async () => {
       const mockError = new Error('Network failure')
       global.fetch = jest.fn().mockImplementation(() => Promise.reject(mockError))
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       const { data, error } = await storage.emptyBucket('existing-bucket')
       expect(data).toBeNull()
@@ -286,7 +264,7 @@ describe('Bucket API Error Handling', () => {
       const nonResponseError = new TypeError('Operation not supported')
       global.fetch = jest.fn().mockImplementation(() => Promise.reject(nonResponseError))
 
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       const { data, error } = await storage.emptyBucket('test-bucket')
       expect(data).toBeNull()
@@ -296,7 +274,7 @@ describe('Bucket API Error Handling', () => {
 
     it('throws non-StorageError exceptions', async () => {
       // Create a storage client
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       // Create a spy on the post method that will throw a non-StorageError
       const mockFn = jest.spyOn(require('../src/lib/fetch'), 'post').mockImplementationOnce(() => {
@@ -320,7 +298,7 @@ describe('Bucket API Error Handling', () => {
     it('handles network errors', async () => {
       const mockError = new Error('Network failure')
       global.fetch = jest.fn().mockImplementation(() => Promise.reject(mockError))
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       const { data, error } = await storage.deleteBucket('existing-bucket')
       expect(data).toBeNull()
@@ -332,7 +310,7 @@ describe('Bucket API Error Handling', () => {
       const nonResponseError = new TypeError('Invalid delete operation')
       global.fetch = jest.fn().mockImplementation(() => Promise.reject(nonResponseError))
 
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       const { data, error } = await storage.deleteBucket('test-bucket')
       expect(data).toBeNull()
@@ -342,7 +320,7 @@ describe('Bucket API Error Handling', () => {
 
     it('throws non-StorageError exceptions', async () => {
       // Create a storage client
-      const storage = new StorageClient(URL, { apikey: KEY })
+      const storage = createTestStorageClient()
 
       // Create a spy on the remove method that will throw a non-StorageError
       const mockFn = jest

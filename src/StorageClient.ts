@@ -1,6 +1,6 @@
-import StorageFileApi from './packages/StorageFileApi'
-import StorageBucketApi from './packages/StorageBucketApi'
 import { Fetch } from './lib/fetch'
+import StorageBucketApi from './packages/StorageBucketApi'
+import StorageFileApi from './packages/StorageFileApi'
 
 export interface StorageClientOptions {
   useNewHostname?: boolean
