@@ -401,8 +401,10 @@ describe('Object API', () => {
 
     test('move object across buckets in different path', async () => {
       const newBucketName = 'bucket-move'
+      await findOrCreateBucket(newBucketName)
 
       const newPath = `testpath/file-to-move-${Date.now()}.txt`
+      await storage.from(bucketName).upload(uploadPath, file)
 
       const res = await storage.from(bucketName).move(uploadPath, newPath, {
         destinationBucket: newBucketName,
@@ -426,6 +428,7 @@ describe('Object API', () => {
 
     test('copy object across buckets to different path', async () => {
       const newBucketName = 'bucket-move'
+      await findOrCreateBucket(newBucketName)
       const newPath = `testpath/file-copied-${Date.now()}.txt`
       await storage.from(bucketName).upload(uploadPath, file)
       const res = await storage.from(bucketName).copy(uploadPath, newPath, {
