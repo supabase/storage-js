@@ -755,30 +755,7 @@ export default class StorageFileApi {
       }
   > {
     try {
-      let sortBy = DEFAULT_SEARCH_OPTIONS.sortBy
-
-      if (options?.sort_by || options?.sort_order) {
-        sortBy = {
-          column: options.sort_by || DEFAULT_SEARCH_OPTIONS.sortBy.column,
-          order: options.sort_order || DEFAULT_SEARCH_OPTIONS.sortBy.order,
-        }
-      } else if (options?.sortBy) {
-        sortBy = {
-          column: options.sortBy.column || DEFAULT_SEARCH_OPTIONS.sortBy.column,
-          order: options.sortBy.order || DEFAULT_SEARCH_OPTIONS.sortBy.order,
-        }
-      }
-
-      const body = {
-        ...DEFAULT_SEARCH_OPTIONS,
-        ...options,
-        sortBy,
-        prefix: path || '',
-      }
-
-      delete body.sort_by
-      delete body.sort_order
-
+      const body = { ...DEFAULT_SEARCH_OPTIONS, ...options, prefix: path || '' }
       const data = await post(
         this.fetch,
         `${this.url}/object/list/${this.bucketId}`,

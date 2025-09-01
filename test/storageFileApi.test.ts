@@ -339,57 +339,6 @@ describe('Object API', () => {
       )
     })
 
-    test('list objects with flat sort_by and sort_order', async () => {
-      await storage.from(bucketName).upload(uploadPath, file)
-      const res = await storage.from(bucketName).list('testpath', {
-        sort_by: 'name',
-        sort_order: 'desc',
-      })
-
-      expect(res.error).toBeNull()
-      expect(res.data).toEqual([
-        expect.objectContaining({
-          name: uploadPath.replace('testpath/', ''),
-        }),
-      ])
-    })
-
-    test('list objects with sortBy format still works', async () => {
-      await storage.from(bucketName).upload(uploadPath, file)
-      const res = await storage.from(bucketName).list('testpath', {
-        sortBy: {
-          column: 'name',
-          order: 'asc',
-        },
-      })
-
-      expect(res.error).toBeNull()
-      expect(res.data).toEqual([
-        expect.objectContaining({
-          name: uploadPath.replace('testpath/', ''),
-        }),
-      ])
-    })
-
-    test('list objects prioritizes flat format over nested format', async () => {
-      await storage.from(bucketName).upload(uploadPath, file)
-      const res = await storage.from(bucketName).list('testpath', {
-        sort_by: 'created_at',
-        sort_order: 'desc',
-        sortBy: {
-          column: 'name',
-          order: 'asc',
-        },
-      })
-
-      expect(res.error).toBeNull()
-      expect(res.data).toEqual([
-        expect.objectContaining({
-          name: uploadPath.replace('testpath/', ''),
-        }),
-      ])
-    })
-
     test('move object to different path', async () => {
       const newPath = `testpath/file-moved-${Date.now()}.txt`
       await storage.from(bucketName).upload(uploadPath, file)
