@@ -85,6 +85,9 @@ describe('Bucket API Error Handling', () => {
       expect(data).toBeNull()
       expect(error).not.toBeNull()
       expect(error?.message).toBe(`headers must have required property 'authorization'`)
+
+      // should throw when .throwOnError is enabled
+      await expect(storage.throwOnError().listBuckets()).rejects.toThrowError()
     })
 
     it('handles network errors', async () => {
