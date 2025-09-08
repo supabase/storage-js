@@ -703,6 +703,9 @@ export default class StorageFileApi {
       )
       return { data, error: null }
     } catch (error) {
+      if (this.shouldThrowOnError) {
+        throw error
+      }
       if (isStorageError(error)) {
         return { data: null, error }
       }

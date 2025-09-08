@@ -86,7 +86,10 @@ describe('Bucket API Error Handling', () => {
       expect(error).not.toBeNull()
       expect(error?.message).toBe(`headers must have required property 'authorization'`)
 
-      await expect(storage.throwOnError().listBuckets()).rejects.toThrowError()
+      // throws when .throwOnError is enabled
+      await expect(storage.throwOnError().listBuckets()).rejects.toThrowError(
+        "headers must have required property 'authorization'"
+      )
     })
 
     it('handles network errors', async () => {
@@ -99,7 +102,8 @@ describe('Bucket API Error Handling', () => {
       expect(error).not.toBeNull()
       expect(error?.message).toBe('Network failure')
 
-      await expect(storage.throwOnError().listBuckets()).rejects.toThrowError()
+      // throws when .throwOnError is enabled
+      await expect(storage.throwOnError().listBuckets()).rejects.toThrowError('Network failure')
     })
 
     it('wraps non-Response errors as StorageUnknownError', async () => {
@@ -115,6 +119,7 @@ describe('Bucket API Error Handling', () => {
       expect(error).toBeInstanceOf(StorageUnknownError)
       expect(error?.message).toBe('Invalid argument')
 
+      // throws when .throwOnError is enabled
       await expect(storage.throwOnError().listBuckets()).rejects.toThrowError('Invalid argument')
     })
 
@@ -149,6 +154,7 @@ describe('Bucket API Error Handling', () => {
       expect(error).not.toBeNull()
       expect(error?.message).toBe('Network failure')
 
+      // throws when .throwOnError is enabled
       await expect(storage.throwOnError().getBucket('non-existent-bucket')).rejects.toThrow(
         'Network failure'
       )
@@ -199,7 +205,10 @@ describe('Bucket API Error Handling', () => {
       expect(error).not.toBeNull()
       expect(error?.message).toBe('Network failure')
 
-      // expect(storage.throwOnError().createBucket('new-bucket')).toThrow('network failure')
+      // throws when .throwOnError is enabled
+      await expect(storage.throwOnError().createBucket('new-bucket')).rejects.toThrow(
+        'Network failure'
+      )
     })
 
     it('wraps non-Response errors as StorageUnknownError', async () => {
@@ -247,6 +256,7 @@ describe('Bucket API Error Handling', () => {
       expect(error).not.toBeNull()
       expect(error?.message).toBe('Network failure')
 
+      // throws when .throwOnError is enabled
       await expect(
         storage.throwOnError().updateBucket('existing-bucket', { public: true })
       ).rejects.toThrow('Network failure')
@@ -297,6 +307,7 @@ describe('Bucket API Error Handling', () => {
       expect(error).not.toBeNull()
       expect(error?.message).toBe('Network failure')
 
+      // throws when .throwOnError is enabled
       await expect(storage.throwOnError().emptyBucket('existing-bucket')).rejects.toThrow(
         'Network failure'
       )
@@ -347,6 +358,7 @@ describe('Bucket API Error Handling', () => {
       expect(error).not.toBeNull()
       expect(error?.message).toBe('Network failure')
 
+      // throws when .throwOnError is enabled
       await expect(storage.throwOnError().deleteBucket('existing-bucket')).rejects.toThrow(
         'Network failure'
       )
@@ -363,6 +375,7 @@ describe('Bucket API Error Handling', () => {
       expect(error).toBeInstanceOf(StorageUnknownError)
       expect(error?.message).toBe('Invalid delete operation')
 
+      // throws when .throwOnError is enabled
       await expect(storage.throwOnError().deleteBucket('test-bucket')).rejects.toThrow(
         'Invalid delete operation'
       )
