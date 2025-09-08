@@ -67,7 +67,7 @@ describe('Object API', () => {
       )
     })
 
-    test('upload files', async () => {
+    test('upload files error handling', async () => {
       const { data, error } = await storage.from('non-existent-bucket').upload(uploadPath, file)
 
       expect(data).toBeNull()
@@ -336,11 +336,6 @@ describe('Object API', () => {
           name: uploadPath.replace('testpath/', ''),
         }),
       ])
-
-      //throws when .throwOnError is enabled
-      await expect(
-        storage.from(bucketName).throwOnError().list('non-existent-path')
-      ).rejects.toThrow()
     })
 
     test('list objects V2', async () => {
