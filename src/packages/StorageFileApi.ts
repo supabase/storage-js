@@ -13,6 +13,7 @@ import {
   SearchV2Options,
   SearchV2Result,
 } from '../lib/types'
+import BlobDownloadBuilder from './BlobDownloadBuilder'
 
 const DEFAULT_SEARCH_OPTIONS = {
   limit: 100,
@@ -521,52 +522,22 @@ export default class StorageFileApi {
    *
    * @param path The full path and file name of the file to be downloaded. For example `folder/image.png`.
    * @param options.transform Transform the asset before serving it to the client.
-   * @param options.stream If set to true, the response will be a ReadableStream. Otherwise, it will be a Blob (default).
    */
-  async download<Options extends { transform?: TransformOptions, stream?: boolean }>(
+  download<Options extends { transform?: TransformOptions }>(
     path: string,
     options?: Options
-  ): Promise<
-    | {
-        data: Options['stream'] extends true ? ReadableStream : Blob
-        error: null
-      }
-    | {
-        data: null
-        error: StorageError
-      }
-  > {
+  ): BlobDownloadBuilder {
     const wantsTransformation = typeof options?.transform !== 'undefined'
     const renderPath = wantsTransformation ? 'render/image/authenticated' : 'object'
     const transformationQuery = this.transformOptsToQueryString(options?.transform || {})
     const queryString = transformationQuery ? `?${transformationQuery}` : ''
-
-    try {
-      const _path = this._getFinalPath(path)
-      const res = await get(this.fetch, `${this.url}/${renderPath}/${_path}${queryString}`, {
+    const _path = this._getFinalPath(path)
+    const downloadFn = () =>
+      get(this.fetch, `${this.url}/${renderPath}/${_path}${queryString}`, {
         headers: this.headers,
         noResolveJson: true,
       })
-
-      if (!options?.stream) {
-        const data = await res.blob()
-        return { data, error: null }
-      }
-
-      return {
-        data: res.body,
-        error: null,
-      }
-    } catch (error) {
-      if (this.shouldThrowOnError) {
-        throw error
-      }
-      if (isStorageError(error)) {
-        return { data: null, error }
-      }
-
-      throw error
-    }
+    return new BlobDownloadBuilder(downloadFn, this.shouldThrowOnError)
   }
 
   /**
