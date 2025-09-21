@@ -45,7 +45,7 @@ type FileBody =
 export default class StorageFileApi {
   protected url: string
   protected headers: { [key: string]: string }
-  protected bucketId?: string
+  protected bucketId: string | undefined
   protected fetch: Fetch
   protected shouldThrowOnError = false
 
