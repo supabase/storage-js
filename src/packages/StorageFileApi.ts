@@ -1,6 +1,7 @@
 import { isStorageError, StorageError, StorageUnknownError } from '../lib/errors'
 import { Fetch, get, head, post, put, remove } from '../lib/fetch'
 import { recursiveToCamel, resolveFetch } from '../lib/helpers'
+import { lookup } from 'mime-types'
 import {
   FileObject,
   FileOptions,
@@ -176,6 +177,12 @@ export default class StorageFileApi {
     return this.uploadOrUpdate('POST', path, fileBody, fileOptions)
   }
 
+  private _getExpectedContentType(path: string): string {
+    const extension = path.split('.').pop() || ''
+    const mimeType = lookup(extension)
+    return mimeType || ''
+  }
+
   /**
    * Upload a file with a token generated from `createSignedUploadUrl`.
    * @param path The file path, including the file name. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
@@ -212,7 +219,15 @@ export default class StorageFileApi {
       } else {
         body = fileBody
         headers['cache-control'] = `max-age=${options.cacheControl}`
+
+        const expectedContentType = this._getExpectedContentType(path)
         headers['content-type'] = options.contentType as string
+
+        if (headers['content-type'] !== expectedContentType) {
+          throw new StorageError(
+            `Content-type mismatch. Expected: "${expectedContentType}", but received: "${headers['content-type']}" for file "${path}"`
+          )
+        }
       }
 
       const data = await put(this.fetch, url.toString(), body as object, { headers })
