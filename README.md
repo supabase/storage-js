@@ -156,20 +156,24 @@ const storageClient = new StorageClient(STORAGE_URL, {
   const { data, error } = await storageClient.from('public-bucket').getPublicUrl('path/to/file')
   ```
 
+- Check if a file exists:
+
+  ```js
+  const { data, error } = await storageClient.from('bucket').exists('path/to/file')
+  // data will be true if the file exists, false otherwise
+  ```
+
 ### Error Handling
 
 Supplying `.throwOnError()` will throw errors instead of returning them as a property on the response object.
 
-  ```js
-  try {
-    const { data } = await storageClient
-      .from('bucket')
-      .throwOnError()
-      .download('path/to/file')
-  } catch (error) {
-    console.error(error)
-  }
-  ```
+```js
+try {
+  const { data } = await storageClient.from('bucket').throwOnError().download('path/to/file')
+} catch (error) {
+  console.error(error)
+}
+```
 
 ## Sponsors
 
