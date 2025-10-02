@@ -1,4 +1,34 @@
-# `storage-js`
+# ⚠️ REPOSITORY DEPRECATED - MOVED TO MONOREPO
+
+> **🚨 This repository has been moved and will be archived on October 10, 2025**
+>
+> **All development has moved to the [Supabase JS Monorepo](https://github.com/supabase/supabase-js)**
+>
+> **If you're looking for the README of `storage-js`, you can find it at:**  
+> **https://github.com/supabase/supabase-js/tree/master/packages/core/storage-js**
+>
+> ### What happened?
+>
+> This repository was merged into the main Supabase JS monorepo for better coordination, testing, and releases.
+>
+> ### What you need to do:
+>
+> - **📖 For documentation**: Visit the [new storage-js location](https://github.com/supabase/supabase-js/tree/master/packages/core/storage-js)
+> - **🐛 For issues**: Create them in the [supabase-js repository](https://github.com/supabase/supabase-js/issues)
+> - **🔧 For contributions**: See the [Contributing Guide](https://github.com/supabase/supabase-js/blob/master/CONTRIBUTING.md)
+> - **📚 For migration help**: Read the [Migration Guide](https://github.com/supabase/supabase-js/blob/master/docs/MIGRATION.md)
+>
+> ### If you have open work:
+>
+> - **Uncommitted changes**: Manually transport your work to the monorepo (file structure is the same under `packages/core/storage-js/`)
+> - **Open PRs**: Tag a maintainer in your PR and we'll help you migrate it
+> - **Issues**: Will be transported to the supabase-js repository
+>
+> **⚠️ This is the old repository. Please use the [supabase-js monorepo](https://github.com/supabase/supabase-js) going forward.**
+
+---
+
+# `storage-js` (DEPRECATED - USE MONOREPO)
 
 <div align="center">
 
@@ -160,16 +190,13 @@ const storageClient = new StorageClient(STORAGE_URL, {
 
 Supplying `.throwOnError()` will throw errors instead of returning them as a property on the response object.
 
-  ```js
-  try {
-    const { data } = await storageClient
-      .from('bucket')
-      .throwOnError()
-      .download('path/to/file')
-  } catch (error) {
-    console.error(error)
-  }
-  ```
+```js
+try {
+  const { data } = await storageClient.from('bucket').throwOnError().download('path/to/file')
+} catch (error) {
+  console.error(error)
+}
+```
 
 ## Sponsors
 
